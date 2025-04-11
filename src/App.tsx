@@ -10,6 +10,8 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AvailableSlots from "./pages/AvailableSlots";
+import Analytics from "./pages/Analytics";
+import Reservations from "./pages/Reservations";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,16 @@ const App = () => (
             <Route path="/available-slots" element={
               <ProtectedRoute>
                 <AvailableSlots />
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            } />
+            <Route path="/reservations" element={
+              <ProtectedRoute>
+                <Reservations />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
