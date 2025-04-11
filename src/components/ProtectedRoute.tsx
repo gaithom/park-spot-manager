@@ -1,7 +1,7 @@
 
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { useParking } from "@/context/ParkingContext";
+import { useParking } from "@/context/parking";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { user } = useParking();
