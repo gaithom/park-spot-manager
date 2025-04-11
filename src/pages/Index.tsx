@@ -1,7 +1,6 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useParking } from "@/context/ParkingContext";
+import { useParking } from "@/context/parking";
 
 const Index = () => {
   const { user } = useParking();

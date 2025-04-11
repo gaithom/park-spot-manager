@@ -1,5 +1,4 @@
-
-import { useParking } from "@/context/ParkingContext";
+import { useParking } from "@/context/parking";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogOut, Car, Menu, BarChart2, Calendar, Layers, Users } from "lucide-react";

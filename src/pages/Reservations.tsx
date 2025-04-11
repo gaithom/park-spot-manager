@@ -1,5 +1,4 @@
-
-import { useParking } from "@/context/ParkingContext";
+import { useParking } from "@/context/parking";
 import NavBar from "@/components/NavBar";
 import ActiveReservations from "@/components/ActiveReservations";
 import ReservationForm from "@/components/ReservationForm";

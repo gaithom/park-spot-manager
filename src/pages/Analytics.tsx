@@ -1,5 +1,5 @@
 
-import { useParking } from "@/context/ParkingContext";
+import { useParking } from "@/context/parking";
 import NavBar from "@/components/NavBar";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

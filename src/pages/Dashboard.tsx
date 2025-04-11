@@ -1,5 +1,4 @@
-
-import { useParking } from "@/context/ParkingContext";
+import { useParking } from "@/context/parking";
 import NavBar from "@/components/NavBar";
 import ParkingStats from "@/components/ParkingStats";
 import ParkingTable from "@/components/ParkingTable";

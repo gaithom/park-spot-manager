@@ -1,5 +1,4 @@
-
-import { useParking } from "@/context/ParkingContext";
+import { useParking } from "@/context/parking";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Car, CircleSlash, Sparkles } from "lucide-react";
