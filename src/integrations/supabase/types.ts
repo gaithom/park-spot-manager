@@ -1,0 +1,289 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  public: {
+    Tables: {
+      bookings: {
+        Row: {
+          created_at: string
+          date: string
+          description: string
+          id: string
+          service: string
+          status: string
+          tailor_id: string
+          time: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          description: string
+          id?: string
+          service: string
+          status?: string
+          tailor_id: string
+          time: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          service?: string
+          status?: string
+          tailor_id?: string
+          time?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_tailor_id_fkey"
+            columns: ["tailor_id"]
+            isOneToOne: false
+            referencedRelation: "tailors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cars: {
+        Row: {
+          brand: string
+          color: string
+          comfort: number
+          created_at: string
+          drivetrain: string
+          fuel_consumption: number
+          horsepower: number
+          id: string
+          image: string
+          model: string
+          price: number
+          top_speed: number
+          torque: number
+          transmission: string
+          year: number
+        }
+        Insert: {
+          brand: string
+          color: string
+          comfort: number
+          created_at?: string
+          drivetrain: string
+          fuel_consumption: number
+          horsepower: number
+          id?: string
+          image: string
+          model: string
+          price: number
+          top_speed: number
+          torque: number
+          transmission: string
+          year: number
+        }
+        Update: {
+          brand?: string
+          color?: string
+          comfort?: number
+          created_at?: string
+          drivetrain?: string
+          fuel_consumption?: number
+          horsepower?: number
+          id?: string
+          image?: string
+          model?: string
+          price?: number
+          top_speed?: number
+          torque?: number
+          transmission?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      tailors: {
+        Row: {
+          bio: string
+          completed_orders: number
+          created_at: string
+          experience: number
+          id: string
+          image: string
+          languages: string[]
+          location: string
+          name: string
+          portfolio: string[]
+          rating: number
+          review_count: number
+          specialties: string[]
+          starting_price: number
+          turnaround_time: string
+        }
+        Insert: {
+          bio: string
+          completed_orders: number
+          created_at?: string
+          experience: number
+          id?: string
+          image: string
+          languages: string[]
+          location: string
+          name: string
+          portfolio: string[]
+          rating: number
+          review_count: number
+          specialties: string[]
+          starting_price: number
+          turnaround_time: string
+        }
+        Update: {
+          bio?: string
+          completed_orders?: number
+          created_at?: string
+          experience?: number
+          id?: string
+          image?: string
+          languages?: string[]
+          location?: string
+          name?: string
+          portfolio?: string[]
+          rating?: number
+          review_count?: number
+          specialties?: string[]
+          starting_price?: number
+          turnaround_time?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DefaultSchema = Database[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof Database },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof Database },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const
