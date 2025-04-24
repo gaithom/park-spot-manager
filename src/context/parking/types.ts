@@ -32,8 +32,8 @@ export const TOTAL_SLOTS = 10;
 
 // Vehicle type categories with different rates
 export const INITIAL_VEHICLE_CATEGORIES: VehicleTypeCategory[] = [
-  { name: "Sedan", hourlyRate: 100, count: 0 },
-  { name: "SUV", hourlyRate: 100, count: 0 },
-  { name: "Truck", hourlyRate: 150, count: 0 },
-  { name: "Motorcycle", hourlyRate: 50, count: 0 },
+  { name: "Sedan", hourlyRate: 150, count: 0 },
+  { name: "SUV", hourlyRate: 200, count: 0 },
+  { name: "Truck", hourlyRate: 300, count: 0 },
+  { name: "Motorcycle", hourlyRate: 80, count: 0 },
 ];
