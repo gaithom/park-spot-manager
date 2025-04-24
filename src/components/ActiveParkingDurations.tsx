@@ -18,8 +18,10 @@ const ActiveParkingDurations = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const calculateDuration = (entryTime: string) => {
-    const start = new Date(entryTime);
+  const calculateDuration = (entryTime: string | Date | null): string => {
+    if (!entryTime) return "N/A";
+    
+    const start = entryTime instanceof Date ? entryTime : new Date(entryTime);
     const diff = currentTime.getTime() - start.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -53,7 +55,7 @@ const ActiveParkingDurations = () => {
                     <TableCell>{slot.slotNumber}</TableCell>
                     <TableCell>{slot.vehicle?.regNumber}</TableCell>
                     <TableCell>{formatDateTime(slot.vehicle?.entryTime || '')}</TableCell>
-                    <TableCell>{calculateDuration(slot.vehicle?.entryTime || '')}</TableCell>
+                    <TableCell>{calculateDuration(slot.vehicle?.entryTime)}</TableCell>
                   </TableRow>
                 ))
               ) : (
