@@ -1,7 +1,8 @@
+
 import { useParking } from "@/context/parking";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Car, Menu, BarChart2, Calendar, Layers, Users } from "lucide-react";
+import { LogOut, Car, Menu, BarChart2, Calendar, Layers } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 
@@ -65,14 +66,16 @@ const NavBar = () => {
                   <Calendar className="h-4 w-4 mr-2" />
                   Reservations
                 </Link>
-                <Link 
-                  to="/analytics" 
-                  onClick={() => setOpen(false)}
-                  className="flex items-center p-2 hover:bg-muted rounded-md"
-                >
-                  <BarChart2 className="h-4 w-4 mr-2" />
-                  Analytics
-                </Link>
+                {user.role === "admin" && (
+                  <Link 
+                    to="/analytics" 
+                    onClick={() => setOpen(false)}
+                    className="flex items-center p-2 hover:bg-muted rounded-md"
+                  >
+                    <BarChart2 className="h-4 w-4 mr-2" />
+                    Analytics
+                  </Link>
+                )}
                 <Button 
                   variant="destructive" 
                   className="mt-2"
@@ -123,15 +126,17 @@ const NavBar = () => {
               Reservations
             </Button>
           </Link>
-          <Link to="/analytics">
-            <Button 
-              variant={isActive("/analytics") ? "default" : "ghost"}
-              className="flex items-center"
-            >
-              <BarChart2 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-          </Link>
+          {user.role === "admin" && (
+            <Link to="/analytics">
+              <Button 
+                variant={isActive("/analytics") ? "default" : "ghost"}
+                className="flex items-center"
+              >
+                <BarChart2 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+            </Link>
+          )}
           <Button variant="outline" onClick={handleLogout} className="ml-2">
             <LogOut className="h-4 w-4 mr-2" />
             Logout
