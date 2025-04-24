@@ -1,4 +1,3 @@
-
 import { ParkingSlot, Vehicle, User, ParkingHistory, VehicleTypeCategory, ParkingReservation, DailyRevenue, VehicleTypeDistribution } from "@/types";
 
 export interface ParkingContextType {
@@ -33,8 +32,8 @@ export const TOTAL_SLOTS = 10;
 
 // Vehicle type categories with different rates
 export const INITIAL_VEHICLE_CATEGORIES: VehicleTypeCategory[] = [
-  { name: "Sedan", hourlyRate: 10, count: 0 },
-  { name: "SUV", hourlyRate: 15, count: 0 },
-  { name: "Truck", hourlyRate: 25, count: 0 },
-  { name: "Motorcycle", hourlyRate: 5, count: 0 },
+  { name: "Sedan", hourlyRate: 100, count: 0 },
+  { name: "SUV", hourlyRate: 100, count: 0 },
+  { name: "Truck", hourlyRate: 150, count: 0 },
+  { name: "Motorcycle", hourlyRate: 50, count: 0 },
 ];
