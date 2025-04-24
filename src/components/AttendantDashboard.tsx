@@ -7,14 +7,12 @@ import ParkVehicleForm from "./ParkVehicleForm"
 import RemoveVehicleForm from "./RemoveVehicleForm"
 import VehicleHistory from "./VehicleHistory"
 import ActiveParkingDurations from "./ActiveParkingDurations"
-import DailyRevenueSummary from "./DailyRevenueSummary"
 
 const AttendantDashboard = () => {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
         <ParkingStats />
-        <DailyRevenueSummary />
       </div>
 
       <Tabs defaultValue="parking">
