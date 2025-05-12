@@ -9,7 +9,15 @@ import { History, Search } from "lucide-react";
 
 const VehicleHistory = () => {
   const [searchReg, setSearchReg] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  interface VehicleHistoryRecord {
+    id: string;
+    slotNumber: string;
+    entryTime: string;
+    exitTime: string;
+    fee: number;
+  }
+
+  const [searchResults, setSearchResults] = useState<VehicleHistoryRecord[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const { getVehicleHistory } = useParking();
 
@@ -17,7 +25,14 @@ const VehicleHistory = () => {
     if (!searchReg.trim()) return;
     
     const results = getVehicleHistory(searchReg.trim());
-    setSearchResults(results);
+    setSearchResults(
+      results.map((record) => ({
+        ...record,
+        slotNumber: record.slotNumber.toString(),
+        entryTime: record.entryTime.toISOString(),
+        exitTime: record.exitTime.toISOString(),
+      }))
+    );
     setHasSearched(true);
   };
 
