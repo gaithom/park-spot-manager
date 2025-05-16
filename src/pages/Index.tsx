@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParking } from "@/context/parking";
@@ -7,11 +8,11 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to dashboard if logged in, otherwise to login
+    // Redirect to home page for public users, dashboard if logged in
     if (user.isLoggedIn) {
       navigate("/dashboard");
     } else {
-      navigate("/login");
+      navigate("/home");
     }
   }, [user.isLoggedIn, navigate]);
 
