@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -82,6 +81,15 @@ const Home = () => {
     }
   };
 
+  const handleScroll = () => {
+    const sections = ["hero", "features", "how-it-works", "cta"];
+    const currentIndex = sections.indexOf(activeSection);
+    const nextSection = sections[currentIndex + 1];
+    if (nextSection) {
+      showSection(nextSection);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col overflow-hidden">
       <HomeNavBar />
@@ -114,7 +122,7 @@ const Home = () => {
             variant="ghost" 
             size="icon" 
             className="rounded-full p-2 scroll-button" 
-            onClick={() => showSection("features")}
+            onClick={handleScroll}
           >
             <ChevronDown className="h-10 w-10 text-primary cursor-pointer" />
           </Button>
@@ -157,23 +165,15 @@ const Home = () => {
             ))}
           </div>
         </div>
-        <div className="w-full flex justify-center mt-12">
-          <div className="flex gap-4">
-            <Button 
-              variant="outline" 
-              onClick={() => showSection("hero")} 
-              className="scroll-button"
-            >
-              Previous
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => showSection("how-it-works")} 
-              className="scroll-button"
-            >
-              Next
-            </Button>
-          </div>
+        <div className="absolute bottom-10 w-full flex justify-center animate-bounce">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full p-2 scroll-button" 
+            onClick={handleScroll}
+          >
+            <ChevronDown className="h-10 w-10 text-primary cursor-pointer" />
+          </Button>
         </div>
       </section>
 
@@ -219,23 +219,15 @@ const Home = () => {
             ))}
           </div>
         </div>
-        <div className="w-full flex justify-center mt-12">
-          <div className="flex gap-4">
-            <Button 
-              variant="outline" 
-              onClick={() => showSection("features")} 
-              className="scroll-button"
-            >
-              Previous
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => showSection("cta")} 
-              className="scroll-button"
-            >
-              Next
-            </Button>
-          </div>
+        <div className="absolute bottom-10 w-full flex justify-center animate-bounce">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full p-2 scroll-button" 
+            onClick={handleScroll}
+          >
+            <ChevronDown className="h-10 w-10 text-primary cursor-pointer" />
+          </Button>
         </div>
       </section>
 
@@ -251,15 +243,6 @@ const Home = () => {
           </p>
           <Button asChild size="lg" variant="secondary">
             <Link to="/login">Sign In Now</Link>
-          </Button>
-        </div>
-        <div className="w-full flex justify-center mt-12">
-          <Button 
-            variant="secondary" 
-            onClick={() => showSection("how-it-works")} 
-            className="scroll-button"
-          >
-            Previous
           </Button>
         </div>
       </section>
