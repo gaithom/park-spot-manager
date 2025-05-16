@@ -1,9 +1,10 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown } from "lucide-react";
+import HomeNavBar from "@/components/HomeNavBar";
 
 const Home = () => {
   useEffect(() => {
@@ -33,10 +34,12 @@ const Home = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <HomeNavBar />
+      
       {/* Hero Section */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-4 relative">
+      <section className="min-h-[90vh] flex flex-col items-center justify-center text-center px-4 relative">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold mb-6 text-primary">ParkSpot Manager</h1>
+          <h1 className="text-5xl font-bold mb-6 text-primary">ParkEase</h1>
           <p className="text-xl mb-8">
             Modern parking management solution for efficient vehicle tracking and space optimization
           </p>
@@ -145,7 +148,7 @@ const Home = () => {
         <div className="max-w-4xl mx-auto text-center opacity-0 reveal-on-scroll transition-all duration-700">
           <h2 className="text-4xl font-bold mb-6">Ready to optimize your parking management?</h2>
           <p className="text-xl mb-8">
-            Join thousands of facilities worldwide using ParkSpot Manager to streamline their operations.
+            Join thousands of facilities worldwide using ParkEase to streamline their operations.
           </p>
           <Button asChild size="lg" variant="secondary">
             <Link to="/login">Sign In Now</Link>
