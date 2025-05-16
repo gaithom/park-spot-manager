@@ -8,6 +8,12 @@ import HomeNavBar from "@/components/HomeNavBar";
 
 const Home = () => {
   useEffect(() => {
+    // Initialize all sections to be invisible
+    const hiddenElements = document.querySelectorAll(".reveal-on-scroll");
+    hiddenElements.forEach((el) => {
+      el.classList.add("opacity-0");
+    });
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -20,7 +26,6 @@ const Home = () => {
       { threshold: 0.1 }
     );
 
-    const hiddenElements = document.querySelectorAll(".reveal-on-scroll");
     hiddenElements.forEach((el) => observer.observe(el));
 
     return () => {
@@ -29,7 +34,19 @@ const Home = () => {
   }, []);
 
   const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      
+      // Ensure the element is visible after scrolling
+      setTimeout(() => {
+        const revealElements = element.querySelectorAll(".reveal-on-scroll");
+        revealElements.forEach(el => {
+          el.classList.add("animate-fade-in");
+          el.classList.remove("opacity-0");
+        });
+      }, 300);
+    }
   };
 
   return (
@@ -57,10 +74,14 @@ const Home = () => {
           </div>
         </div>
         <div className="absolute bottom-10 w-full flex justify-center animate-bounce">
-          <ChevronDown
-            className="h-10 w-10 text-primary cursor-pointer"
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full p-2" 
             onClick={() => scrollToSection("features")}
-          />
+          >
+            <ChevronDown className="h-10 w-10 text-primary cursor-pointer" />
+          </Button>
         </div>
       </section>
 
