@@ -8,7 +8,7 @@ const Dashboard = () => {
   const { user } = useParking();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col bg-indigo-200">
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-6">
         <div className="mb-6">

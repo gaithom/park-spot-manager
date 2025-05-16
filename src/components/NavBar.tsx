@@ -1,8 +1,7 @@
-
 import { useParking } from "@/context/parking";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LogOut, Car, Menu, BarChart2, Calendar, Layers } from "lucide-react";
+import { LogOut, Car, Menu, BarChart2, Calendar, Layers, Home } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 
@@ -23,7 +22,7 @@ const NavBar = () => {
     <header className="bg-white border-b sticky top-0 z-10">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         <div className="flex items-center">
-          <Link to="/dashboard" className="flex items-center">
+          <Link to="/" className="flex items-center">
             <Car className="h-6 w-6 text-primary mr-2" />
             <h1 className="text-xl font-bold text-gray-900">ParkEase</h1>
           </Link>
@@ -42,45 +41,35 @@ const NavBar = () => {
                 <h2 className="font-medium pb-2 border-b">
                   Welcome, {user.username}
                 </h2>
-                <Link 
-                  to="/dashboard" 
-                  onClick={() => setOpen(false)}
-                  className="flex items-center p-2 hover:bg-muted rounded-md"
-                >
+
+                <Link to="/" onClick={() => setOpen(false)} className="flex items-center p-2 hover:bg-muted rounded-md">
+                  <Home className="h-4 w-4 mr-2" />
+                  Home
+                </Link>
+
+                <Link to="/dashboard" onClick={() => setOpen(false)} className="flex items-center p-2 hover:bg-muted rounded-md">
                   <Car className="h-4 w-4 mr-2" />
                   Dashboard
                 </Link>
-                <Link 
-                  to="/available-slots" 
-                  onClick={() => setOpen(false)}
-                  className="flex items-center p-2 hover:bg-muted rounded-md"
-                >
+
+                <Link to="/available-slots" onClick={() => setOpen(false)} className="flex items-center p-2 hover:bg-muted rounded-md">
                   <Layers className="h-4 w-4 mr-2" />
                   Available Slots
                 </Link>
-                <Link 
-                  to="/reservations" 
-                  onClick={() => setOpen(false)}
-                  className="flex items-center p-2 hover:bg-muted rounded-md"
-                >
+
+                <Link to="/reservations" onClick={() => setOpen(false)} className="flex items-center p-2 hover:bg-muted rounded-md">
                   <Calendar className="h-4 w-4 mr-2" />
                   Reservations
                 </Link>
+
                 {user.role === "admin" && (
-                  <Link 
-                    to="/analytics" 
-                    onClick={() => setOpen(false)}
-                    className="flex items-center p-2 hover:bg-muted rounded-md"
-                  >
+                  <Link to="/analytics" onClick={() => setOpen(false)} className="flex items-center p-2 hover:bg-muted rounded-md">
                     <BarChart2 className="h-4 w-4 mr-2" />
                     Analytics
                   </Link>
                 )}
-                <Button 
-                  variant="destructive" 
-                  className="mt-2"
-                  onClick={handleLogout}
-                >
+
+                <Button variant="destructive" className="mt-2" onClick={handleLogout}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
@@ -99,44 +88,44 @@ const NavBar = () => {
               </span>
             )}
           </div>
+
+          <Link to="/">
+            <Button variant={isActive("/") ? "default" : "ghost"} className="flex items-center">
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Button>
+          </Link>
+
           <Link to="/dashboard">
-            <Button 
-              variant={isActive("/dashboard") ? "default" : "ghost"}
-              className="flex items-center"
-            >
+            <Button variant={isActive("/dashboard") ? "default" : "ghost"} className="flex items-center">
               <Car className="h-4 w-4 mr-2" />
               Dashboard
             </Button>
           </Link>
+
           <Link to="/available-slots">
-            <Button 
-              variant={isActive("/available-slots") ? "default" : "ghost"}
-              className="flex items-center"
-            >
+            <Button variant={isActive("/available-slots") ? "default" : "ghost"} className="flex items-center">
               <Layers className="h-4 w-4 mr-2" />
               Available Slots
             </Button>
           </Link>
+
           <Link to="/reservations">
-            <Button 
-              variant={isActive("/reservations") ? "default" : "ghost"}
-              className="flex items-center"
-            >
+            <Button variant={isActive("/reservations") ? "default" : "ghost"} className="flex items-center">
               <Calendar className="h-4 w-4 mr-2" />
               Reservations
             </Button>
           </Link>
+
           {user.role === "admin" && (
             <Link to="/analytics">
-              <Button 
-                variant={isActive("/analytics") ? "default" : "ghost"}
-                className="flex items-center"
-              >
+              <Button variant={isActive("/analytics") ? "default" : "ghost"} className="flex items-center">
                 <BarChart2 className="h-4 w-4 mr-2" />
                 Analytics
               </Button>
             </Link>
           )}
+
           <Button variant="outline" onClick={handleLogout} className="ml-2">
             <LogOut className="h-4 w-4 mr-2" />
             Logout
