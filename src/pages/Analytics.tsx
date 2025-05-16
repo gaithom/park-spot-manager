@@ -40,7 +40,7 @@ const Analytics = () => {
     : 0;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col bg-gray-50">
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-6">
         <div className="mb-6 flex items-center">

@@ -11,7 +11,7 @@ const AvailableSlots = () => {
   const availableSlots = slots.filter(slot => !slot.isOccupied);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col bg-white">
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-6">
         <div className="mb-6 flex items-center">
