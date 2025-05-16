@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,8 @@ import { ChevronDown } from "lucide-react";
 import HomeNavBar from "@/components/HomeNavBar";
 
 const Home = () => {
+  const [activeSection, setActiveSection] = useState("hero");
+
   useEffect(() => {
     // Initialize all sections to be invisible
     const hiddenElements = document.querySelectorAll(".reveal-on-scroll");
@@ -14,6 +16,14 @@ const Home = () => {
       el.classList.add("opacity-0");
     });
 
+    // Make hero section visible by default
+    const heroElements = document.querySelectorAll("#hero .reveal-on-scroll");
+    heroElements.forEach((el) => {
+      el.classList.add("animate-fade-in");
+      el.classList.remove("opacity-0");
+    });
+
+    // Only observe sections after the hero section
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -26,26 +36,36 @@ const Home = () => {
       { threshold: 0.1 }
     );
 
-    hiddenElements.forEach((el) => observer.observe(el));
+    // Only observe non-hero sections when scrolling naturally
+    const nonHeroElements = document.querySelectorAll(".reveal-on-scroll:not(#hero .reveal-on-scroll)");
+    nonHeroElements.forEach((el) => observer.observe(el));
 
     return () => {
-      hiddenElements.forEach((el) => observer.unobserve(el));
+      const allElements = document.querySelectorAll(".reveal-on-scroll");
+      allElements.forEach((el) => observer.unobserve(el));
     };
   }, []);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+  const showSection = (id: string) => {
+    // Hide all sections first
+    document.querySelectorAll("section").forEach((section) => {
+      section.classList.add("hidden");
+    });
+    
+    // Show only the target section
+    const targetSection = document.getElementById(id);
+    if (targetSection) {
+      targetSection.classList.remove("hidden");
       
-      // Ensure the element is visible after scrolling
-      setTimeout(() => {
-        const revealElements = element.querySelectorAll(".reveal-on-scroll");
-        revealElements.forEach(el => {
-          el.classList.add("animate-fade-in");
-          el.classList.remove("opacity-0");
-        });
-      }, 300);
+      // Reveal all elements in this section
+      const revealElements = targetSection.querySelectorAll(".reveal-on-scroll");
+      revealElements.forEach(el => {
+        el.classList.add("animate-fade-in");
+        el.classList.remove("opacity-0");
+      });
+      
+      // Update active section
+      setActiveSection(id);
     }
   };
 
@@ -54,7 +74,10 @@ const Home = () => {
       <HomeNavBar />
       
       {/* Hero Section */}
-      <section className="min-h-[90vh] flex flex-col items-center justify-center text-center px-4 relative">
+      <section 
+        id="hero" 
+        className={`min-h-[90vh] flex flex-col items-center justify-center text-center px-4 relative ${activeSection !== "hero" ? "hidden" : ""}`}
+      >
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold mb-6 text-primary">ParkEase</h1>
           <p className="text-xl mb-8">
@@ -67,7 +90,7 @@ const Home = () => {
             <Button
               variant="outline"
               size="lg"
-              onClick={() => scrollToSection("features")}
+              onClick={() => showSection("features")}
             >
               Learn More
             </Button>
@@ -77,8 +100,8 @@ const Home = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="rounded-full p-2" 
-            onClick={() => scrollToSection("features")}
+            className="rounded-full p-2 scroll-button" 
+            onClick={() => showSection("features")}
           >
             <ChevronDown className="h-10 w-10 text-primary cursor-pointer" />
           </Button>
@@ -88,7 +111,7 @@ const Home = () => {
       {/* Features Section */}
       <section
         id="features"
-        className="py-20 px-4 bg-muted"
+        className={`py-20 px-4 bg-muted min-h-[90vh] flex flex-col items-center justify-center ${activeSection !== "features" ? "hidden" : ""}`}
       >
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center">Key Features</h2>
@@ -121,10 +144,31 @@ const Home = () => {
             ))}
           </div>
         </div>
+        <div className="w-full flex justify-center mt-12">
+          <div className="flex gap-4">
+            <Button 
+              variant="outline" 
+              onClick={() => showSection("hero")} 
+              className="scroll-button"
+            >
+              Previous
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => showSection("how-it-works")} 
+              className="scroll-button"
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 px-4">
+      <section 
+        id="how-it-works" 
+        className={`py-20 px-4 min-h-[90vh] flex flex-col items-center justify-center ${activeSection !== "how-it-works" ? "hidden" : ""}`}
+      >
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-12 text-center">How It Works</h2>
           <div className="space-y-16">
@@ -162,10 +206,31 @@ const Home = () => {
             ))}
           </div>
         </div>
+        <div className="w-full flex justify-center mt-12">
+          <div className="flex gap-4">
+            <Button 
+              variant="outline" 
+              onClick={() => showSection("features")} 
+              className="scroll-button"
+            >
+              Previous
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => showSection("cta")} 
+              className="scroll-button"
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-primary text-white">
+      <section 
+        id="cta" 
+        className={`py-20 px-4 bg-primary text-white min-h-[90vh] flex flex-col items-center justify-center ${activeSection !== "cta" ? "hidden" : ""}`}
+      >
         <div className="max-w-4xl mx-auto text-center opacity-0 reveal-on-scroll transition-all duration-700">
           <h2 className="text-4xl font-bold mb-6">Ready to optimize your parking management?</h2>
           <p className="text-xl mb-8">
@@ -173,6 +238,15 @@ const Home = () => {
           </p>
           <Button asChild size="lg" variant="secondary">
             <Link to="/login">Sign In Now</Link>
+          </Button>
+        </div>
+        <div className="w-full flex justify-center mt-12">
+          <Button 
+            variant="secondary" 
+            onClick={() => showSection("how-it-works")} 
+            className="scroll-button"
+          >
+            Previous
           </Button>
         </div>
       </section>
