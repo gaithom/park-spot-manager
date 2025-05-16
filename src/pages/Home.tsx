@@ -47,30 +47,43 @@ const Home = () => {
   }, []);
 
   const showSection = (id: string) => {
-    // Hide all sections first
-    document.querySelectorAll("section").forEach((section) => {
-      section.classList.add("hidden");
-    });
-    
-    // Show only the target section
-    const targetSection = document.getElementById(id);
-    if (targetSection) {
-      targetSection.classList.remove("hidden");
+    // Hide current section with a slide-out animation
+    const currentSection = document.getElementById(activeSection);
+    if (currentSection) {
+      currentSection.classList.add("animate-slide-out");
       
-      // Reveal all elements in this section
-      const revealElements = targetSection.querySelectorAll(".reveal-on-scroll");
-      revealElements.forEach(el => {
-        el.classList.add("animate-fade-in");
-        el.classList.remove("opacity-0");
-      });
-      
-      // Update active section
-      setActiveSection(id);
+      // After animation completes, hide the section
+      setTimeout(() => {
+        currentSection.classList.add("hidden");
+        currentSection.classList.remove("animate-slide-out");
+        
+        // Show new section with slide-in animation
+        const targetSection = document.getElementById(id);
+        if (targetSection) {
+          targetSection.classList.remove("hidden");
+          targetSection.classList.add("animate-slide-in");
+          
+          // Reveal all elements in this section
+          const revealElements = targetSection.querySelectorAll(".reveal-on-scroll");
+          revealElements.forEach(el => {
+            el.classList.add("animate-fade-in");
+            el.classList.remove("opacity-0");
+          });
+          
+          // Update active section
+          setActiveSection(id);
+          
+          // Remove the animation class after it completes
+          setTimeout(() => {
+            targetSection.classList.remove("animate-slide-in");
+          }, 500);
+        }
+      }, 500);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-hidden">
       <HomeNavBar />
       
       {/* Hero Section */}
@@ -79,11 +92,11 @@ const Home = () => {
         className={`min-h-[90vh] flex flex-col items-center justify-center text-center px-4 relative ${activeSection !== "hero" ? "hidden" : ""}`}
       >
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold mb-6 text-primary">ParkEase</h1>
-          <p className="text-xl mb-8">
+          <h1 className="text-5xl font-bold mb-6 text-primary reveal-on-scroll">ParkEase</h1>
+          <p className="text-xl mb-8 reveal-on-scroll">
             Modern parking management solution for efficient vehicle tracking and space optimization
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center reveal-on-scroll">
             <Button asChild size="lg" className="bg-primary">
               <Link to="/login">Get Started</Link>
             </Button>
@@ -114,7 +127,7 @@ const Home = () => {
         className={`py-20 px-4 bg-muted min-h-[90vh] flex flex-col items-center justify-center ${activeSection !== "features" ? "hidden" : ""}`}
       >
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center">Key Features</h2>
+          <h2 className="text-4xl font-bold mb-12 text-center reveal-on-scroll">Key Features</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
@@ -170,7 +183,7 @@ const Home = () => {
         className={`py-20 px-4 min-h-[90vh] flex flex-col items-center justify-center ${activeSection !== "how-it-works" ? "hidden" : ""}`}
       >
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center">How It Works</h2>
+          <h2 className="text-4xl font-bold mb-12 text-center reveal-on-scroll">How It Works</h2>
           <div className="space-y-16">
             {[
               {

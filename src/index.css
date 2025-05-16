@@ -98,8 +98,45 @@
   }
 }
 
+/* Animation for section transitions */
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
 .animate-fade-in {
   animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.5s ease-out forwards;
+  position: absolute;
+  width: 100%;
+  top: 0;
+}
+
+.animate-slide-out {
+  animation: slide-out 0.5s ease-out forwards;
+  position: absolute;
+  width: 100%;
+  top: 0;
 }
 
 /* Make the scroll transition smoother */
@@ -114,4 +151,11 @@ html {
 
 .scroll-button:hover {
   transform: scale(1.1);
+}
+
+/* Section positioning for overlay effect */
+section {
+  position: relative;
+  width: 100%;
+  min-height: 90vh;
 }
