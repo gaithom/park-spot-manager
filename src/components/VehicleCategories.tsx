@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParking } from "@/context/parking";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,9 +27,9 @@ const VehicleCategories = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="bg-green-500/5">
-        <CardTitle className="flex items-center text-green-600">
+    <Card className="w-full bg-black border-primary/20">
+      <CardHeader className="bg-primary/5 border-b border-primary/20">
+        <CardTitle className="flex items-center text-primary">
           <Tags className="mr-2 h-5 w-5" /> Vehicle Categories
         </CardTitle>
       </CardHeader>
@@ -36,17 +37,18 @@ const VehicleCategories = () => {
         <form onSubmit={handleSubmit} className="space-y-4 mb-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="categoryName">Category Name</Label>
+              <Label htmlFor="categoryName" className="text-foreground">Category Name</Label>
               <Input
                 id="categoryName"
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
                 placeholder="e.g., Pickup Truck"
+                className="bg-secondary border-primary/20"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="hourlyRate">Hourly Rate (ksh)</Label>
+              <Label htmlFor="hourlyRate" className="text-foreground">Hourly Rate (ksh)</Label>
               <Input
                 id="hourlyRate"
                 type="number"
@@ -55,19 +57,20 @@ const VehicleCategories = () => {
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(e.target.value)}
                 placeholder="e.g., 15"
+                className="bg-secondary border-primary/20"
                 required
               />
             </div>
           </div>
-          <Button type="submit" className="w-full bg-green-600">
+          <Button type="submit" className="w-full bg-primary">
             Add Category
           </Button>
         </form>
 
-        <div className="rounded-md border">
+        <div className="rounded-md border border-primary/20 overflow-hidden">
           <Table>
-            <TableHeader>
-              <TableRow>
+            <TableHeader className="bg-secondary">
+              <TableRow className="border-b border-primary/20">
                 <TableHead>Category</TableHead>
                 <TableHead>Hourly Rate (ksh)</TableHead>
                 <TableHead>Current Count</TableHead>
@@ -76,9 +79,9 @@ const VehicleCategories = () => {
             <TableBody>
               {vehicleTypeCategories.map((category) => (
                 <TableRow key={category.name}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell>{category.hourlyRate.toFixed(2)}</TableCell>
-                  <TableCell>{category.count}</TableCell>
+                  <TableCell className="font-medium text-foreground">{category.name}</TableCell>
+                  <TableCell className="text-foreground">{category.hourlyRate.toFixed(2)}</TableCell>
+                  <TableCell className="text-foreground">{category.count}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

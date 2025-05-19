@@ -1,3 +1,4 @@
+
 import { useParking } from "@/context/parking";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -14,15 +15,15 @@ const StatCard = ({
   icon: React.ElementType;
   className?: string;
 }) => (
-  <Card className={cn("shadow-sm", className)}>
+  <Card className={cn("shadow-sm bg-black border-primary/20", className)}>
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <h3 className="mt-1 text-2xl font-bold tracking-tight">{value}</h3>
+          <h3 className="mt-1 text-2xl font-bold tracking-tight text-foreground">{value}</h3>
         </div>
         <div className={cn("rounded-full p-2", className)}>
-          <Icon className="h-5 w-5 text-white" />
+          <Icon className="h-5 w-5 text-primary" />
         </div>
       </div>
     </CardContent>
@@ -39,19 +40,19 @@ const ParkingStats = () => {
         title="Total Slots"
         value={totalSlots}
         icon={Sparkles}
-        className="bg-primary/10"
+        className="bg-black border-primary/30"
       />
       <StatCard
         title="Available Slots"
         value={availableSlots}
         icon={Car}
-        className="bg-success/10"
+        className="bg-black border-primary/30"
       />
       <StatCard
         title="Occupied Slots"
         value={occupiedSlots}
         icon={CircleSlash}
-        className="bg-danger/10"
+        className="bg-black border-primary/30"
       />
     </div>
   );

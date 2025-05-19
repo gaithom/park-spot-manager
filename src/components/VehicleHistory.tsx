@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParking } from "@/context/parking";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,9 +38,9 @@ const VehicleHistory = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="bg-purple-500/5">
-        <CardTitle className="flex items-center text-purple-600">
+    <Card className="w-full bg-black border-primary/20">
+      <CardHeader className="bg-primary/5 border-b border-primary/20">
+        <CardTitle className="flex items-center text-primary">
           <History className="mr-2 h-5 w-5" /> Vehicle History
         </CardTitle>
       </CardHeader>
@@ -49,17 +50,18 @@ const VehicleHistory = () => {
             placeholder="Enter vehicle registration"
             value={searchReg}
             onChange={(e) => setSearchReg(e.target.value)}
+            className="bg-secondary border-primary/20"
           />
-          <Button onClick={handleSearch} className="bg-purple-600">
+          <Button onClick={handleSearch} className="bg-primary">
             <Search className="h-4 w-4 mr-2" /> Search
           </Button>
         </div>
 
         {hasSearched && (
-          <div className="rounded-md border">
+          <div className="rounded-md border border-primary/20 overflow-hidden">
             <Table>
-              <TableHeader>
-                <TableRow>
+              <TableHeader className="bg-secondary">
+                <TableRow className="border-b border-primary/20">
                   <TableHead>Slot</TableHead>
                   <TableHead>Entry Time</TableHead>
                   <TableHead>Exit Time</TableHead>
@@ -70,10 +72,10 @@ const VehicleHistory = () => {
                 {searchResults.length > 0 ? (
                   searchResults.map((record) => (
                     <TableRow key={record.id}>
-                      <TableCell>{record.slotNumber}</TableCell>
-                      <TableCell>{formatDateTime(record.entryTime)}</TableCell>
-                      <TableCell>{formatDateTime(record.exitTime)}</TableCell>
-                      <TableCell>{record.fee.toFixed(2)}</TableCell>
+                      <TableCell className="text-foreground">{record.slotNumber}</TableCell>
+                      <TableCell className="text-foreground">{formatDateTime(record.entryTime)}</TableCell>
+                      <TableCell className="text-foreground">{formatDateTime(record.exitTime)}</TableCell>
+                      <TableCell className="text-foreground">{record.fee.toFixed(2)}</TableCell>
                     </TableRow>
                   ))
                 ) : (

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParking } from "@/context/parking";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,49 +31,51 @@ const UserManagement = () => {
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader className="bg-indigo-500/5">
-        <CardTitle className="flex items-center text-indigo-600">
+    <Card className="w-full bg-black border-primary/20">
+      <CardHeader className="bg-primary/5 border-b border-primary/20">
+        <CardTitle className="flex items-center text-primary">
           <Users className="mr-2 h-5 w-5" /> User Management
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username" className="text-foreground">Username</Label>
             <Input
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="New username"
+              className="bg-secondary border-primary/20"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-foreground">Password</Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="New password"
+              className="bg-secondary border-primary/20"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label>User Role</Label>
+            <Label className="text-foreground">User Role</Label>
             <RadioGroup value={role} onValueChange={(value) => setRole(value as "admin" | "attendant")}>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="admin" id="admin" />
-                <Label htmlFor="admin">Admin</Label>
+                <RadioGroupItem value="admin" id="admin" className="border-primary text-primary" />
+                <Label htmlFor="admin" className="text-foreground">Admin</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="attendant" id="attendant" />
-                <Label htmlFor="attendant">Attendant</Label>
+                <RadioGroupItem value="attendant" id="attendant" className="border-primary text-primary" />
+                <Label htmlFor="attendant" className="text-foreground">Attendant</Label>
               </div>
             </RadioGroup>
           </div>
-          <Button type="submit" className="w-full bg-indigo-600">
+          <Button type="submit" className="w-full bg-primary">
             Add User
           </Button>
         </form>

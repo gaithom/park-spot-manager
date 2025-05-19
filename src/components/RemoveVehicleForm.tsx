@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParking } from "@/context/parking";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,8 +21,8 @@ const RemoveVehicleForm = () => {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader className="bg-destructive/5">
+    <Card className="w-full bg-black border-primary/20">
+      <CardHeader className="bg-destructive/10 border-b border-primary/20">
         <CardTitle className="flex items-center text-destructive">
           <CarTaxiFront className="mr-2 h-5 w-5" /> Remove Vehicle
         </CardTitle>
@@ -29,12 +30,13 @@ const RemoveVehicleForm = () => {
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="removeRegNumber">Vehicle Registration Number</Label>
+            <Label htmlFor="removeRegNumber" className="text-foreground">Vehicle Registration Number</Label>
             <Input
               id="removeRegNumber"
               value={regNumber}
               onChange={(e) => setRegNumber(e.target.value)}
               placeholder="Enter registration number"
+              className="bg-secondary border-primary/20"
               required
             />
           </div>
