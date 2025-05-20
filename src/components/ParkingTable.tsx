@@ -8,7 +8,7 @@ const ParkingTable = () => {
   const { slots } = useParking();
 
   return (
-    <div className="rounded-md border border-neutral-700/20 bg-background shadow-sm overflow-hidden">
+    <div className="rounded-lg border border-neutral-700/20 bg-background shadow-sm overflow-hidden">
       <Table>
         <TableHeader className="bg-secondary">
           <TableRow className="border-b border-neutral-700/20">
