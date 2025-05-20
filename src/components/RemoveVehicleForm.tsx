@@ -21,7 +21,7 @@ const RemoveVehicleForm = () => {
   };
 
   return (
-    <Card className="w-full bg-black border-primary/20">
+    <Card className="w-full bg-background border-primary/20">
       <CardHeader className="bg-destructive/10 border-b border-primary/20">
         <CardTitle className="flex items-center text-destructive">
           <CarTaxiFront className="mr-2 h-5 w-5" /> Remove Vehicle

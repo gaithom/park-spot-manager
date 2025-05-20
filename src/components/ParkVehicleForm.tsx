@@ -23,7 +23,7 @@ const ParkVehicleForm = () => {
   };
 
   return (
-    <Card className="w-full bg-black border-primary/20">
+    <Card className="w-full bg-background border-primary/20">
       <CardHeader className="bg-primary/10 border-b border-primary/20">
         <CardTitle className="flex items-center text-primary">
           <Car className="mr-2 h-5 w-5" /> Park Vehicle
