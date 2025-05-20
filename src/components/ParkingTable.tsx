@@ -1,3 +1,4 @@
+
 import { useParking } from "@/context/parking";
 import { formatDateTime } from "@/lib/utils";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -7,10 +8,10 @@ const ParkingTable = () => {
   const { slots } = useParking();
 
   return (
-    <div className="rounded-md border bg-white shadow-sm">
+    <div className="rounded-md border border-primary/20 bg-black shadow-sm overflow-hidden">
       <Table>
-        <TableHeader className="bg-muted/50">
-          <TableRow>
+        <TableHeader className="bg-secondary">
+          <TableRow className="border-b border-primary/20">
             <TableHead>Slot</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Registration</TableHead>
@@ -20,22 +21,22 @@ const ParkingTable = () => {
         </TableHeader>
         <TableBody>
           {slots.map((slot) => (
-            <TableRow key={slot.slotNumber} className={slot.isOccupied ? "bg-muted/20" : ""}>
-              <TableCell className="font-medium">{slot.slotNumber}</TableCell>
+            <TableRow key={slot.slotNumber} className={slot.isOccupied ? "bg-secondary/50" : ""}>
+              <TableCell className="font-medium text-foreground">{slot.slotNumber}</TableCell>
               <TableCell>
                 {slot.isOccupied ? (
-                  <div className="flex items-center text-red-500">
+                  <div className="flex items-center text-destructive">
                     <XCircle className="mr-1 h-4 w-4" /> Occupied
                   </div>
                 ) : (
-                  <div className="flex items-center text-green-600">
+                  <div className="flex items-center text-success">
                     <CheckCircle className="mr-1 h-4 w-4" /> Available
                   </div>
                 )}
               </TableCell>
-              <TableCell>{slot.vehicle?.regNumber || "—"}</TableCell>
-              <TableCell>{slot.vehicle?.vehicleType || "—"}</TableCell>
-              <TableCell>
+              <TableCell className="text-foreground">{slot.vehicle?.regNumber || "—"}</TableCell>
+              <TableCell className="text-foreground">{slot.vehicle?.vehicleType || "—"}</TableCell>
+              <TableCell className="text-foreground">
                 {slot.vehicle?.entryTime 
                   ? formatDateTime(slot.vehicle.entryTime) 
                   : "—"}
