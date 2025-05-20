@@ -42,7 +42,7 @@ const Home = () => {
       {/* Hero Section */}
       <section id="hero" className="min-h-screen flex flex-col items-center justify-center text-center px-4 relative bg-white">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold mb-6 text-primary reveal-on-scroll text-green-900">ParkEase</h1>
+          <h1 className="text-5xl font-bold mb-6 text-primary reveal-on-scroll text-red-900">ParkEase</h1>
           <p className="text-2xl mb-8 reveal-on-scroll font-bold">
             Modern parking management solution for efficient vehicle tracking and space optimization
           </p>
@@ -129,7 +129,7 @@ const Home = () => {
 
       {/* How It Works Section */}
       <section id="how-it-works" className="py-20 px-4 min-h-screen flex flex-col items-center justify-center bg-white">
-  <div className="max-w-6xl mx-auto">
+  <div className="max-w-6xl mx-auto text-red-900">
     <h2 className="text-4xl font-bold mb-12 text-center reveal-on-scroll relative inline-block after:block after:h-1 after:bg-primary after:w-16 after:mx-auto after:mt-2">
       How It Works
     </h2>
@@ -181,10 +181,12 @@ const Home = () => {
 </section>
 
       {/* CTA Section */}
-      <section id="cta" className="py-20 px-4 bg-primary text-white min-h-screen flex flex-col items-center justify-center bg-indigo-200">
+    
+      <section id="cta" className="relative h-96 bg-gradient-to-r from-red-900 to-indigo-600 text-white
+       py-20 px-4 bg-primary text-white min-h-screen flex flex-col items-center justify-center bg-indigo-200">
         <div className="max-w-4xl mx-auto text-center opacity-0 reveal-on-scroll transition-all duration-700">
           <h2 className="text-4xl font-bold mb-6 text-slate-900">Ready to optimize your parking management?</h2>
-          <p className="text-xl mb-8 text-slate-700">
+          <p className="text-xl mb-8 text-slate-500">
             Join thousands of facilities worldwide using ParkEase to streamline their operations.
           </p>
           <Button asChild size="lg" variant="secondary">
@@ -192,6 +194,7 @@ const Home = () => {
           </Button>
         </div>
       </section>
+
     </div>
   );
 };
