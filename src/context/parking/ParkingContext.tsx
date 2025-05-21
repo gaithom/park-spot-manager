@@ -58,7 +58,7 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("parkingUser", JSON.stringify(user));
   }, [user]);
 
-  // Update vehicle distribution whenever slots change
+  // Update vehicle distribution whenever slots or vehicleTypeCategories change
   useEffect(() => {
     updateVehicleDistribution(
       slots, 
@@ -66,7 +66,7 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
       setVehicleTypeCategories, 
       setVehicleTypeDistribution
     );
-  }, [slots]);
+  }, [slots, vehicleTypeCategories]);
 
   // Create wrapper functions to abstract the implementation details
   const login = (username: string, password: string): boolean => {
@@ -136,10 +136,4 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useParking = () => {
-  const context = useContext(ParkingContext);
-  if (context === undefined) {
-    throw new Error("useParking must be used within a ParkingProvider");
-  }
-  return context;
-};
+// useParking hook moved to a separate file (useParking.ts)

@@ -26,8 +26,11 @@ const Analytics = () => {
     return acc;
   }, {} as Record<string, number>);
 
-  const mostCommonVehicleType = Object.entries(vehicleTypeCounts).reduce(
-    (max, [type, count]) => (count > max.count ? { type, count } : max),
+  const mostCommonVehicleType = Object.entries(vehicleTypeCounts).reduce<{ type: string; count: number }>(
+    (max, [type, count]) => {
+      const countNum = Number(count);
+      return countNum > max.count ? { type, count: countNum } : max;
+    },
     { type: "None", count: 0 }
   );
 
