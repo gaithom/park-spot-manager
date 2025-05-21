@@ -181,7 +181,6 @@ const Home = () => {
 </section>
 
       {/* CTA Section */}
-    
       <section id="cta" className="relative h-96 bg-gradient-to-r from-red-900 to-indigo-600 text-white
        py-20 px-4 bg-primary text-white min-h-screen flex flex-col items-center justify-center bg-indigo-200">
         <div className="max-w-4xl mx-auto text-center opacity-0 reveal-on-scroll transition-all duration-700">

@@ -42,7 +42,7 @@ const NavBar = () => {
                   Welcome, {user.username}
                 </h2>
 
-                <Link to="/" onClick={() => setOpen(false)} className="flex items-center p-2 hover:bg-muted rounded-md">
+                <Link to="/" onClick={() => setOpen(false)} className="flex items-center p-2 hover:bg-muted rounded-md text-gray-900">
                   <Home className="h-4 w-4 mr-2" />
                   Home
                 </Link>
