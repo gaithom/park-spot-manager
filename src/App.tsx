@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,7 @@ import { ParkingProvider } from "@/context/parking";
 
 import Home from "./pages/Home"; // Now main home page
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import AvailableSlots from "./pages/AvailableSlots";
 import Analytics from "./pages/Analytics";
@@ -32,6 +34,7 @@ const App = () => (
             <Route path="/landing" element={<Index />} />
 
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
             <Route
               path="/dashboard"

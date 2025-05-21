@@ -15,6 +15,9 @@ const HomeNavBar = () => {
         </div>
         <div className="flex items-center space-x-4">
           <Button asChild variant="outline">
+            <Link to="/register">Register</Link>
+          </Button>
+          <Button asChild variant="default">
             <Link to="/login">Sign In</Link>
           </Button>
         </div>
