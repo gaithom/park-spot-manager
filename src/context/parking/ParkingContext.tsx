@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import {
   ParkingSlot, Vehicle, User, ParkingHistory, 
@@ -136,4 +135,11 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// useParking hook moved to a separate file (useParking.ts)
+// Add the useParking hook
+export const useParking = (): ParkingContextType => {
+  const context = useContext(ParkingContext);
+  if (context === undefined) {
+    throw new Error("useParking must be used within a ParkingProvider");
+  }
+  return context;
+};
