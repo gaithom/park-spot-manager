@@ -5,7 +5,7 @@ import { Car } from "lucide-react";
 
 const HomeNavBar = () => {
   return (
-    <header className="bg-black/95 backdrop-blur-sm border-b border-primary/20 sticky top-0 z-10">
+    <header className="bg-background/95 backdrop-blur-sm border-b border-primary/20 sticky top-0 z-10">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         <div className="flex items-center">
           <Link to="/" className="flex items-center">

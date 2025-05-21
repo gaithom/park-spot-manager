@@ -31,9 +31,9 @@ const UserManagement = () => {
   }
 
   return (
-    <Card className="w-full bg-black border-primary/20">
-      <CardHeader className="bg-primary/5 border-b border-primary/20">
-        <CardTitle className="flex items-center text-primary">
+    <Card className="w-full bg-background border-neutral-700/20">
+      <CardHeader className="bg-secondary/30 border-b border-neutral-700/20">
+        <CardTitle className="flex items-center">
           <Users className="mr-2 h-5 w-5" /> User Management
         </CardTitle>
       </CardHeader>
@@ -46,7 +46,7 @@ const UserManagement = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="New username"
-              className="bg-secondary border-primary/20"
+              className="bg-secondary border-neutral-700/20"
               required
             />
           </div>
@@ -58,7 +58,7 @@ const UserManagement = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="New password"
-              className="bg-secondary border-primary/20"
+              className="bg-secondary border-neutral-700/20"
               required
             />
           </div>
@@ -66,16 +66,16 @@ const UserManagement = () => {
             <Label className="text-foreground">User Role</Label>
             <RadioGroup value={role} onValueChange={(value) => setRole(value as "admin" | "attendant")}>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="admin" id="admin" className="border-primary text-primary" />
+                <RadioGroupItem value="admin" id="admin" className="border-neutral-400" />
                 <Label htmlFor="admin" className="text-foreground">Admin</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="attendant" id="attendant" className="border-primary text-primary" />
+                <RadioGroupItem value="attendant" id="attendant" className="border-neutral-400" />
                 <Label htmlFor="attendant" className="text-foreground">Attendant</Label>
               </div>
             </RadioGroup>
           </div>
-          <Button type="submit" className="w-full bg-primary">
+          <Button type="submit" className="w-full">
             Add User
           </Button>
         </form>

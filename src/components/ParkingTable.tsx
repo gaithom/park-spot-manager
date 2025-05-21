@@ -8,20 +8,20 @@ const ParkingTable = () => {
   const { slots } = useParking();
 
   return (
-    <div className="rounded-md border border-primary/20 bg-black shadow-sm overflow-hidden">
+    <div className="rounded-lg border border-neutral-200 bg-white shadow-sm overflow-hidden">
       <Table>
         <TableHeader className="bg-secondary">
-          <TableRow className="border-b border-primary/20">
-            <TableHead>Slot</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Registration</TableHead>
-            <TableHead>Vehicle Type</TableHead>
-            <TableHead>Entry Time</TableHead>
+          <TableRow className="border-b border-neutral-200">
+            <TableHead className="text-white">Slot</TableHead>
+            <TableHead className="text-white">Status</TableHead>
+            <TableHead className="text-white">Registration</TableHead>
+            <TableHead className="text-white">Vehicle Type</TableHead>
+            <TableHead className="text-white">Entry Time</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {slots.map((slot) => (
-            <TableRow key={slot.slotNumber} className={slot.isOccupied ? "bg-secondary/50" : ""}>
+            <TableRow key={slot.slotNumber} className={slot.isOccupied ? "bg-muted" : ""}>
               <TableCell className="font-medium text-foreground">{slot.slotNumber}</TableCell>
               <TableCell>
                 {slot.isOccupied ? (
@@ -29,7 +29,7 @@ const ParkingTable = () => {
                     <XCircle className="mr-1 h-4 w-4" /> Occupied
                   </div>
                 ) : (
-                  <div className="flex items-center text-success">
+                  <div className="flex items-center text-secondary">
                     <CheckCircle className="mr-1 h-4 w-4" /> Available
                   </div>
                 )}

@@ -38,9 +38,9 @@ const VehicleHistory = () => {
   };
 
   return (
-    <Card className="w-full bg-black border-primary/20">
-      <CardHeader className="bg-primary/5 border-b border-primary/20">
-        <CardTitle className="flex items-center text-primary">
+    <Card className="w-full bg-background border-neutral-700/20">
+      <CardHeader className="bg-secondary/30 border-b border-neutral-700/20">
+        <CardTitle className="flex items-center">
           <History className="mr-2 h-5 w-5" /> Vehicle History
         </CardTitle>
       </CardHeader>
@@ -50,18 +50,18 @@ const VehicleHistory = () => {
             placeholder="Enter vehicle registration"
             value={searchReg}
             onChange={(e) => setSearchReg(e.target.value)}
-            className="bg-secondary border-primary/20"
+            className="bg-secondary border-neutral-700/20"
           />
-          <Button onClick={handleSearch} className="bg-primary">
+          <Button onClick={handleSearch}>
             <Search className="h-4 w-4 mr-2" /> Search
           </Button>
         </div>
 
         {hasSearched && (
-          <div className="rounded-md border border-primary/20 overflow-hidden">
+          <div className="rounded-md border border-neutral-700/20 overflow-hidden">
             <Table>
               <TableHeader className="bg-secondary">
-                <TableRow className="border-b border-primary/20">
+                <TableRow className="border-b border-neutral-700/20">
                   <TableHead>Slot</TableHead>
                   <TableHead>Entry Time</TableHead>
                   <TableHead>Exit Time</TableHead>

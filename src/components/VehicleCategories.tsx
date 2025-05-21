@@ -27,9 +27,9 @@ const VehicleCategories = () => {
   };
 
   return (
-    <Card className="w-full bg-black border-primary/20">
-      <CardHeader className="bg-primary/5 border-b border-primary/20">
-        <CardTitle className="flex items-center text-primary">
+    <Card className="w-full bg-background border-neutral-700/20">
+      <CardHeader className="bg-secondary/30 border-b border-neutral-700/20">
+        <CardTitle className="flex items-center">
           <Tags className="mr-2 h-5 w-5" /> Vehicle Categories
         </CardTitle>
       </CardHeader>
@@ -43,7 +43,7 @@ const VehicleCategories = () => {
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
                 placeholder="e.g., Pickup Truck"
-                className="bg-secondary border-primary/20"
+                className="bg-secondary border-neutral-700/20"
                 required
               />
             </div>
@@ -57,20 +57,20 @@ const VehicleCategories = () => {
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(e.target.value)}
                 placeholder="e.g., 15"
-                className="bg-secondary border-primary/20"
+                className="bg-secondary border-neutral-700/20"
                 required
               />
             </div>
           </div>
-          <Button type="submit" className="w-full bg-primary">
+          <Button type="submit" className="w-full">
             Add Category
           </Button>
         </form>
 
-        <div className="rounded-md border border-primary/20 overflow-hidden">
+        <div className="rounded-md border border-neutral-700/20 overflow-hidden">
           <Table>
             <TableHeader className="bg-secondary">
-              <TableRow className="border-b border-primary/20">
+              <TableRow className="border-b border-neutral-700/20">
                 <TableHead>Category</TableHead>
                 <TableHead>Hourly Rate (ksh)</TableHead>
                 <TableHead>Current Count</TableHead>

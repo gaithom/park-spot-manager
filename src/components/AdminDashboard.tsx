@@ -12,43 +12,43 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       <div className="mb-8">
-        <Card className="border-blue-100 shadow-lg">
+        <Card className="border-neutral-800 shadow-lg">
           <ParkingStats />
         </Card>
       </div>
 
-      <Tabs defaultValue="parking" className="bg-blue-50/50 p-6 rounded-lg">
-        <TabsList className="mb-6 bg-white">
-          <TabsTrigger value="parking" className="data-[state=active]:bg-blue-100">Parking</TabsTrigger>
-          <TabsTrigger value="reservations" className="data-[state=active]:bg-blue-100">Reservations</TabsTrigger>
-          <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-100">Analytics</TabsTrigger>
-          <TabsTrigger value="management" className="data-[state=active]:bg-blue-100">Management</TabsTrigger>
+      <Tabs defaultValue="parking" className="bg-black/5 p-6 rounded-lg">
+        <TabsList className="mb-6 bg-background">
+          <TabsTrigger value="parking" className="data-[state=active]:bg-secondary">Parking</TabsTrigger>
+          <TabsTrigger value="reservations" className="data-[state=active]:bg-secondary">Reservations</TabsTrigger>
+          <TabsTrigger value="analytics" className="data-[state=active]:bg-secondary">Analytics</TabsTrigger>
+          <TabsTrigger value="management" className="data-[state=active]:bg-secondary">Management</TabsTrigger>
         </TabsList>
         
         <TabsContent value="parking" className="space-y-6">
-          <Card className="shadow-sm border-blue-100">
+          <Card className="shadow-sm border-neutral-800">
             <ParkingTable />
           </Card>
         </TabsContent>
         
         <TabsContent value="reservations">
-          <Card className="border-blue-100 shadow-md">
+          <Card className="border-neutral-800 shadow-md">
             <ActiveReservations />
           </Card>
         </TabsContent>
         
         <TabsContent value="analytics">
-          <Card className="border-blue-100 shadow-md">
+          <Card className="border-neutral-800 shadow-md">
             <AnalyticsDashboard />
           </Card>
         </TabsContent>
         
         <TabsContent value="management" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="border-blue-100 shadow-md">
+            <Card className="border-neutral-800 shadow-md">
               <VehicleCategories />
             </Card>
-            <Card className="border-blue-100 shadow-md">
+            <Card className="border-neutral-800 shadow-md">
               <UserManagement />
             </Card>
           </div>
@@ -59,4 +59,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-

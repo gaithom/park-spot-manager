@@ -15,7 +15,7 @@ const StatCard = ({
   icon: React.ElementType;
   className?: string;
 }) => (
-  <Card className={cn("shadow-sm bg-black border-primary/20", className)}>
+  <Card className={cn("shadow-sm bg-background border-primary/20", className)}>
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div>
@@ -40,19 +40,19 @@ const ParkingStats = () => {
         title="Total Slots"
         value={totalSlots}
         icon={Sparkles}
-        className="bg-black border-primary/30"
+        className="bg-background border-primary/30"
       />
       <StatCard
         title="Available Slots"
         value={availableSlots}
         icon={Car}
-        className="bg-black border-primary/30"
+        className="bg-background border-primary/30"
       />
       <StatCard
         title="Occupied Slots"
         value={occupiedSlots}
         icon={CircleSlash}
-        className="bg-black border-primary/30"
+        className="bg-background border-primary/30"
       />
     </div>
   );
