@@ -46,6 +46,7 @@ const ReservationForm = () => {
             <Label htmlFor="reserveSlotNumber">Slot Number</Label>
             <select 
               id="reserveSlotNumber"
+              aria-label="Slot Number"
               className="w-full border border-gray-300 rounded-md p-2"
               value={slotNumber}
               onChange={(e) => setSlotNumber(e.target.value)}
