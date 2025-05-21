@@ -38,7 +38,7 @@ const AvailableSlots = () => {
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-secondary">
-                <TableRow className="border-b border-primary/20">
+                <TableRow className="border-b border-primary/20 bg-white">
                   <TableHead>Slot Number</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
