@@ -29,7 +29,7 @@ const AvailableSlots = () => {
           </div>
         </div>
 
-        <Card className="shadow-sm bg-black border-primary/20">
+        <Card className="shadow-sm bg-white border-primary/20">
           <CardHeader className="bg-secondary/50 border-b border-primary/20">
             <CardTitle className="text-xl text-foreground">
               Available Slots: {availableSlots.length}
