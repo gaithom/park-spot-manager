@@ -1,9 +1,11 @@
+
 import { useParking } from "@/context/parking";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LogOut, Car, Menu, BarChart2, Calendar, Layers, Home } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 const NavBar = () => {
   const { logout, user } = useParking();
@@ -19,20 +21,21 @@ const NavBar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="bg-white border-b sticky top-0 z-10">
+    <header className="bg-background border-b sticky top-0 z-10 dark:bg-slate-900 dark:border-slate-800">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
             <Car className="h-6 w-6 text-primary mr-2" />
-            <h1 className="text-xl font-bold text-gray-900">ParkEase</h1>
+            <h1 className="text-xl font-bold text-foreground">ParkEase</h1>
           </Link>
         </div>
 
         {/* Mobile menu */}
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center">
+          <ThemeToggle />
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="md:hidden ml-2">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -42,7 +45,7 @@ const NavBar = () => {
                   Welcome, {user.username}
                 </h2>
 
-                <Link to="/" onClick={() => setOpen(false)} className="flex items-center p-2 hover:bg-muted rounded-md text-gray-900">
+                <Link to="/" onClick={() => setOpen(false)} className="flex items-center p-2 hover:bg-muted rounded-md text-foreground">
                   <Home className="h-4 w-4 mr-2" />
                   Home
                 </Link>
@@ -83,7 +86,7 @@ const NavBar = () => {
           <div className="mr-4">
             Welcome, <span className="font-medium">{user.username}</span>
             {user.role === "admin" && (
-              <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
+              <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs rounded-full">
                 Admin
               </span>
             )}
@@ -125,6 +128,8 @@ const NavBar = () => {
               </Button>
             </Link>
           )}
+
+          <ThemeToggle />
 
           <Button variant="outline" onClick={handleLogout} className="ml-2">
             <LogOut className="h-4 w-4 mr-2" />

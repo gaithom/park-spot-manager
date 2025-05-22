@@ -55,7 +55,7 @@ export default {
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--foreground))',
+					foreground: 'hsl(var(--secondary-foreground))',
 					primary: 'hsl(var(--primary))',
 					'primary-foreground': 'hsl(var(--primary-foreground))',
 					accent: 'hsl(var(--accent))',

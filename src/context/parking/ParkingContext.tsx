@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import {
   ParkingSlot, Vehicle, User, ParkingHistory, 
@@ -26,6 +27,11 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User>(() => {
     const savedUser = localStorage.getItem("parkingUser");
     return savedUser ? JSON.parse(savedUser) : { username: "", isLoggedIn: false, role: undefined };
+  });
+  // Add theme state
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    const savedTheme = localStorage.getItem("parkingTheme");
+    return (savedTheme === "dark" ? "dark" : "light");
   });
 
   // Calculate available slots
@@ -57,6 +63,16 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("parkingUser", JSON.stringify(user));
   }, [user]);
 
+  // Save theme preference to localStorage and update document class
+  useEffect(() => {
+    localStorage.setItem("parkingTheme", theme);
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
+
   // Update vehicle distribution whenever slots or vehicleTypeCategories change
   useEffect(() => {
     updateVehicleDistribution(
@@ -66,6 +82,11 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
       setVehicleTypeDistribution
     );
   }, [slots, vehicleTypeCategories]);
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === "light" ? "dark" : "light");
+  };
 
   // Create wrapper functions to abstract the implementation details
   const login = (username: string, password: string): boolean => {
@@ -120,6 +141,8 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
       dailyRevenue,
       vehicleTypeDistribution,
       user,
+      theme,
+      toggleTheme,
       login,
       logout,
       parkVehicle: handleParkVehicle,
