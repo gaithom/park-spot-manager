@@ -17,7 +17,7 @@ const UserManagement = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (addUser(username, password, role)) {
+    if (addUser({ username, password, role })) {
       // Reset form if successful
       setUsername("");
       setPassword("");

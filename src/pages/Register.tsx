@@ -26,7 +26,7 @@ const Register = () => {
       return;
     }
 
-    const success = addUser(username, password, role);
+    const success = addUser({ username, password, role });
     if (success) {
       toast.success("Registration successful! Please log in.");
       navigate("/login");

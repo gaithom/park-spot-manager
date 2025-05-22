@@ -12,6 +12,20 @@ import {
 
 export const TOTAL_SLOTS = 50;
 
+// Add the missing USER_CREDENTIALS export
+export const USER_CREDENTIALS: Record<string, { password: string; role: "admin" | "attendant" }> = {
+  "admin": { password: "password123", role: "admin" },
+  "attendant": { password: "password123", role: "attendant" }
+};
+
+// Add the missing INITIAL_VEHICLE_CATEGORIES export
+export const INITIAL_VEHICLE_CATEGORIES: VehicleTypeCategory[] = [
+  { name: "Sedan", hourlyRate: 20, count: 0 },
+  { name: "SUV", hourlyRate: 30, count: 0 },
+  { name: "Truck", hourlyRate: 40, count: 0 },
+  { name: "Motorcycle", hourlyRate: 10, count: 0 }
+];
+
 export interface ParkingContextType {
   slots: ParkingSlot[];
   availableSlots: number;

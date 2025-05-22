@@ -1,4 +1,3 @@
-
 import { ParkingSlot, Vehicle, ParkingHistory, VehicleTypeCategory, ParkingReservation, User, DailyRevenue } from "@/types";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -284,22 +283,23 @@ export const getVehicleHistory = (
 };
 
 export const addUser = (
-  username: string, 
-  password: string, 
-  role: "admin" | "attendant"
+  user: { username: string; password: string; role: string }
 ): boolean => {
-  if (!username || !password) {
+  if (!user.username || !user.password) {
     toast.error("Please provide both username and password!");
     return false;
   }
 
-  if (username in USER_CREDENTIALS) {
-    toast.error(`User ${username} already exists!`);
+  if (user.username in USER_CREDENTIALS) {
+    toast.error(`User ${user.username} already exists!`);
     return false;
   }
 
-  USER_CREDENTIALS[username] = { password, role };
-  toast.success(`User ${username} added successfully as ${role}!`);
+  USER_CREDENTIALS[user.username] = { 
+    password: user.password, 
+    role: user.role as "admin" | "attendant" 
+  };
+  toast.success(`User ${user.username} added successfully as ${user.role}!`);
   return true;
 };
 
