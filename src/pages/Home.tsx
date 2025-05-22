@@ -1,10 +1,10 @@
-
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown } from "lucide-react";
 import HomeNavBar from "@/components/HomeNavBar";
+import Footer from "@/components/Footer";
 import { useParking } from "@/context/parking";
 
 const Home = () => {
@@ -224,6 +224,9 @@ const Home = () => {
           </Button>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
