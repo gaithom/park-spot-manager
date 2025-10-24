@@ -17,7 +17,7 @@ const AvailableSlots = () => {
       <main className="flex-1 container mx-auto px-4 py-6">
         <div className="mb-6 flex items-center">
           <Link to="/dashboard">
-            <Button variant="outline" size="icon" className="mr-4 border-primary/20">
+            <Button variant="outline" size="icon" className="mr-4 border-border hover:bg-muted">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
@@ -29,35 +29,36 @@ const AvailableSlots = () => {
           </div>
         </div>
 
-        <Card className="shadow-sm bg-white border-primary/20">
-          <CardHeader className="bg-secondary/50 border-b border-primary/20">
+        <Card className="shadow-sm border-border">
+          <CardHeader className="bg-secondary/10 border-b border-border">
             <CardTitle className="text-xl text-foreground">
               Available Slots: {availableSlots.length}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
-              <TableHeader className="bg-secondary">
-                <TableRow className="border-b border-primary/20 bg-white">
-                  <TableHead>Slot Number</TableHead>
-                  <TableHead>Status</TableHead>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="text-foreground font-semibold">Slot Number</TableHead>
+                  <TableHead className="text-foreground font-semibold">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {availableSlots.length > 0 ? (
                   availableSlots.map((slot) => (
-                    <TableRow key={slot.slotNumber}>
+                    <TableRow key={slot.slotNumber} className="hover:bg-muted/50">
                       <TableCell className="font-medium text-foreground">{slot.slotNumber}</TableCell>
                       <TableCell>
-                        <div className="flex items-center text-success">
-                          <CheckCircle className="mr-1 h-4 w-4" /> Available
+                        <div className="flex items-center text-success-foreground bg-success/10 px-2 py-1 rounded-md w-fit">
+                          <CheckCircle className="mr-2 h-4 w-4" /> 
+                          <span>Available</span>
                         </div>
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={2} className="text-center py-8 text-foreground">
+                    <TableCell colSpan={2} className="text-center py-8 text-muted-foreground">
                       No available slots at the moment.
                     </TableCell>
                   </TableRow>

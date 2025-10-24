@@ -43,7 +43,7 @@ const Analytics = () => {
     : 0;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col bg-gray-50">
+    <div className="min-h-screen bg-background flex flex-col">
       <NavBar />
       <main className="flex-1 container mx-auto px-4 py-6">
         <div className="mb-6 flex items-center">
@@ -53,7 +53,7 @@ const Analytics = () => {
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Parking Analytics</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Parking Analytics</h1>
             <p className="text-muted-foreground">
               Insights and statistics for your parking operations
             </p>
@@ -68,7 +68,7 @@ const Analytics = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">ksh {totalRevenue.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-foreground">ksh {totalRevenue.toFixed(2)}</div>
             </CardContent>
           </Card>
           
@@ -79,7 +79,7 @@ const Analytics = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{parkingHistory.length}</div>
+              <div className="text-2xl font-bold text-foreground">{parkingHistory.length}</div>
             </CardContent>
           </Card>
           
@@ -90,7 +90,7 @@ const Analytics = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{mostCommonVehicleType.type}</div>
+              <div className="text-2xl font-bold text-foreground">{mostCommonVehicleType.type}</div>
               <p className="text-sm text-muted-foreground">{mostCommonVehicleType.count} visits</p>
             </CardContent>
           </Card>
@@ -102,7 +102,7 @@ const Analytics = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{averageDuration.toFixed(1)} hrs</div>
+              <div className="text-2xl font-bold text-foreground">{averageDuration.toFixed(1)} hrs</div>
             </CardContent>
           </Card>
         </div>
@@ -113,19 +113,19 @@ const Analytics = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
-            <CardHeader className="bg-blue-500/5">
-              <CardTitle className="flex items-center text-blue-600">
+            <CardHeader className="bg-primary/5 border-b border-border">
+              <CardTitle className="flex items-center text-primary">
                 <BarChart className="mr-2 h-5 w-5" /> Recent Transactions
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Vehicle</TableHead>
-                    <TableHead>Exit Time</TableHead>
-                    <TableHead>Duration</TableHead>
-                    <TableHead>Fee</TableHead>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="text-foreground font-medium">Vehicle</TableHead>
+                    <TableHead className="text-foreground font-medium">Exit Time</TableHead>
+                    <TableHead className="text-foreground font-medium">Duration</TableHead>
+                    <TableHead className="text-foreground font-medium">Fee</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -135,10 +135,10 @@ const Analytics = () => {
                       
                       return (
                         <TableRow key={record.id}>
-                          <TableCell className="font-medium">{record.regNumber}</TableCell>
-                          <TableCell>{formatDateTime(record.exitTime)}</TableCell>
-                          <TableCell>{duration.toFixed(1)} hrs</TableCell>
-                          <TableCell>ksh {record.fee.toFixed(2)}</TableCell>
+                          <TableCell className="font-medium text-foreground">{record.regNumber}</TableCell>
+                          <TableCell className="text-foreground/90">{formatDateTime(record.exitTime)}</TableCell>
+                          <TableCell className="text-foreground/90">{duration.toFixed(1)} hrs</TableCell>
+                          <TableCell className="text-foreground/90">ksh {record.fee.toFixed(2)}</TableCell>
                         </TableRow>
                       );
                     })
@@ -155,18 +155,18 @@ const Analytics = () => {
           </Card>
 
           <Card>
-            <CardHeader className="bg-green-500/5">
-              <CardTitle className="flex items-center text-green-600">
+            <CardHeader className="bg-secondary/5 border-b border-border">
+              <CardTitle className="flex items-center text-secondary-foreground">
                 <PieChart className="mr-2 h-5 w-5" /> Vehicle Categories
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Vehicle Type</TableHead>
-                    <TableHead>Hourly Rate</TableHead>
-                    <TableHead>Total Revenue</TableHead>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="text-foreground font-medium">Vehicle Type</TableHead>
+                    <TableHead className="text-foreground font-medium">Hourly Rate</TableHead>
+                    <TableHead className="text-foreground font-medium">Total Revenue</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -177,9 +177,9 @@ const Analytics = () => {
                       
                     return (
                       <TableRow key={category.name}>
-                        <TableCell className="font-medium">{category.name}</TableCell>
-                        <TableCell>ksh {category.hourlyRate.toFixed(2)}</TableCell>
-                        <TableCell>ksh {typeRevenue.toFixed(2)}</TableCell>
+                        <TableCell className="font-medium text-foreground">{category.name}</TableCell>
+                        <TableCell className="text-foreground/90">ksh {category.hourlyRate.toFixed(2)}</TableCell>
+                        <TableCell className="text-foreground/90">ksh {typeRevenue.toFixed(2)}</TableCell>
                       </TableRow>
                     );
                   })}
