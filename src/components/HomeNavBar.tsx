@@ -15,9 +15,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 
+// Import AdminAuthModal
+import AdminAuthModal from "./auth/AdminAuthModal";
+
 const HomeNavBar = () => {
   const { theme, user, logout } = useParking();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +38,28 @@ const HomeNavBar = () => {
     navigate('/');
   };
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+    
+    if (newCount === 4) {
+      // Navigate to admin page after 4 clicks
+      navigate('/admin-login');
+      setClickCount(0);
+    } else if (newCount === 1) {
+      // Reset counter after 3 seconds if not enough clicks
+      setTimeout(() => {
+        setClickCount(0);
+      }, 3000);
+    }
+    
+    if (newCount >= 4) {
+      setShowAdminAuth(true);
+      setClickCount(0);
+    }
+  };
+
   return (
     <header className={`sticky top-0 z-50 transition-all duration-300 ${
       isScrolled 
@@ -41,8 +68,20 @@ const HomeNavBar = () => {
     }`}>
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         <div className="flex items-center">
-          <Link to="/" className="flex items-center group">
-            <Car className="h-6 w-6 text-primary mr-2 group-hover:scale-110 transition-transform" />
+          <Link 
+            to="/" 
+            className="flex items-center group"
+            onClick={handleLogoClick}
+            title={clickCount > 0 ? `${4 - clickCount} more clicks for admin` : undefined}
+          >
+            <div className="relative">
+              <Car className="h-6 w-6 text-primary mr-2 group-hover:scale-110 transition-transform" />
+              {clickCount > 0 && (
+                <div className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  {clickCount}
+                </div>
+              )}
+            </div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               ParkEase
             </h1>
@@ -106,6 +145,12 @@ const HomeNavBar = () => {
           )}
         </div>
       </div>
+      
+      {/* Admin Auth Modal */}
+      <AdminAuthModal
+        isOpen={showAdminAuth}
+        onClose={() => setShowAdminAuth(false)}
+      />
     </header>
   );
 };

@@ -9,6 +9,8 @@ import { ParkingProvider } from "@/context/parking";
 import Home from "./pages/Home"; // Now main home page
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import AdminLogin from "./pages/AdminLogin";
+import AdminLoginPage from "./pages/AdminLoginPage";
 import Dashboard from "./pages/Dashboard";
 import AvailableSlots from "./pages/AvailableSlots";
 import Analytics from "./pages/Analytics";
@@ -35,6 +37,8 @@ const App = () => (
 
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin-login" element={<AdminLoginPage />} />
 
             <Route
               path="/dashboard"
