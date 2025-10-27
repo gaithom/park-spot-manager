@@ -12,6 +12,8 @@ export interface ParkingSlot {
   isReserved?: boolean;
   reservedFor?: string;
   reservationTime?: Date;
+  type?: string;
+  floor?: string;
 }
 
 export interface User {

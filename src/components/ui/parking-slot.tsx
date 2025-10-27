@@ -1,40 +1,18 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { Car, ParkingMeter, ParkingSquare, CarFront } from "lucide-react";
+import { Car, ParkingMeter } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ParkingSlotProps {
   isOccupied?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   showCar?: boolean;
-  carAnimationDelay?: number;
 }
-
-import type { Variants } from 'framer-motion';
-
-const carVariants: Variants = {
-  initial: { y: -20, opacity: 0 },
-  animate: (custom: number) => ({
-    y: 0,
-    opacity: 1,
-    transition: {
-      delay: custom * 0.1,
-      type: 'spring' as const,
-      stiffness: 100,
-      damping: 10
-    }
-  }),
-  hover: {
-    y: -5,
-    transition: { type: 'spring' as const, stiffness: 400, damping: 10 }
-  }
-};
 
 export function ParkingSlot({ 
   isOccupied = false, 
   size = 'md',
   className = '',
-  showCar = true,
-  carAnimationDelay = 0
+  showCar = true
 }: ParkingSlotProps) {
   const sizeClasses = {
     sm: 'w-16 h-10',
@@ -44,98 +22,34 @@ export function ParkingSlot({
 
   const carSizes = {
     sm: 16,
-    md: 22,
-    lg: 28,
+    md: 20,
+    lg: 24,
   };
 
   return (
-    <motion.div 
-      className={`relative ${className}`}
-      variants={carVariants}
-      initial="initial"
-      animate="animate"
-      whileHover="hover"
-      custom={carAnimationDelay}
-    >
-      <div 
-        className={`${sizeClasses[size]} border-2 rounded-md flex items-center justify-center overflow-hidden ${
-          isOccupied 
-            ? 'bg-destructive/5 border-destructive/20' 
-            : 'bg-green-50/80 border-green-200 dark:bg-green-900/10 dark:border-green-800/30'
-        } transition-colors duration-300`}
-      >
-        {isOccupied ? (
-          <motion.div 
-            className="relative w-full h-full flex items-center justify-center"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ 
-              scale: 1, 
-              opacity: 1,
-              transition: { 
-                delay: 0.2 + (carAnimationDelay * 0.1),
-                type: 'spring',
-                stiffness: 100,
-                damping: 10
-              }
-            }}
-          >
-            <CarFront 
-              size={carSizes[size] - 4} 
-              className="text-destructive/80 absolute"
-            />
-            <motion.div 
-              className="absolute inset-0 bg-destructive/5"
-              animate={{
-                opacity: [0.5, 0.8, 0.5],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: 'reverse',
-              }}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            className="flex flex-col items-center justify-center"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ 
-              scale: 1, 
-              opacity: 1,
-              transition: { 
-                delay: 0.5 + (carAnimationDelay * 0.1),
-                type: 'spring',
-                stiffness: 100,
-                damping: 10
-              }
-            }}
-          >
-            <ParkingSquare 
-              size={carSizes[size] - 8} 
-              className="text-green-600/50 dark:text-green-400/50"
-            />
-            <span className="text-[8px] mt-1 text-green-600/60 dark:text-green-400/60">
-              AVAILABLE
-            </span>
-          </motion.div>
-        )}
-      </div>
-      
-      {!isOccupied && (
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
-          initial={{ x: '-100%' }}
-          animate={{ x: '100%' }}
-          transition={{ 
-            delay: 1 + (carAnimationDelay * 0.1),
-            duration: 1.5, 
-            repeat: Infinity, 
-            ease: 'easeInOut' 
-          }}
-          style={{ transform: 'skewX(-20deg)' }}
-        />
+    <div
+      className={cn(
+        "relative rounded-md border-2 flex flex-col items-center justify-center",
+        "transition-colors duration-200",
+        isOccupied
+          ? "border-red-500/30 bg-red-500/5"
+          : "border-green-500/30 hover:border-green-500/50 bg-white/5",
+        sizeClasses[size],
+        className
       )}
-    </motion.div>
+    >
+      {isOccupied && showCar ? (
+        <div className="flex flex-col items-center">
+          <Car className="text-red-500" size={carSizes[size]} />
+          <span className="text-xs text-red-500 mt-1">Occupied</span>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center">
+          <ParkingMeter className="text-green-500" size={carSizes[size]} />
+          <span className="text-xs text-green-500 mt-1">Available</span>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -157,45 +71,28 @@ export function ParkingLotGrid({
   const totalSlots = Math.max(slots, 1);
   const occupiedSlots = Math.min(occupied, totalSlots);
   
+  // Create array of slots with their occupied status
+  const slotStatus = Array(totalSlots).fill(false).map((_, i) => i < occupiedSlots);
+
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={cn("space-y-4", className)}>
       {showTitle && (
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-foreground/80">{title}</h3>
-          <div className="text-xs text-muted-foreground">
-            <span className="text-green-600 dark:text-green-400">{totalSlots - occupiedSlots} available</span>
-            <span className="mx-1">•</span>
-            <span className="text-destructive/80">{occupiedSlots} occupied</span>
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-medium">{title}</h3>
+          <div className="text-sm text-muted-foreground">
+            {occupiedSlots} of {totalSlots} occupied
           </div>
         </div>
       )}
-      
-      <AnimatePresence>
-        <motion.div 
-          className="grid grid-cols-3 gap-3"
-          initial="hidden"
-          animate="show"
-          variants={{
-            hidden: { opacity: 0 },
-            show: {
-              opacity: 1,
-              transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.2
-              }
-            }
-          }}
-        >
-          {Array.from({ length: totalSlots }).map((_, index) => (
-            <ParkingSlot 
-              key={index}
-              isOccupied={index < occupiedSlots}
-              carAnimationDelay={index}
-              size="md"
-            />
-          ))}
-        </motion.div>
-      </AnimatePresence>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        {slotStatus.map((isOccupied, index) => (
+          <ParkingSlot 
+            key={index} 
+            isOccupied={isOccupied}
+            size="md"
+          />
+        ))}
+      </div>
     </div>
   );
 }
