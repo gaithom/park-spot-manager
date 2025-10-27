@@ -1,8 +1,12 @@
 import { useParking } from "@/context/parking";
 import { ParkingSlot } from "@/components/ui/parking-slot";
-import { motion } from "framer-motion";
+import type { ParkingSlot as ParkingSlotType } from "@/types";
 
-const ParkingLotGrid = () => {
+interface ParkingLotGridProps {
+  onSlotSelect?: (slot: ParkingSlotType) => void;
+}
+
+const ParkingLotGrid = ({ onSlotSelect }: ParkingLotGridProps) => {
   const { slots } = useParking();
   
   // Group slots into rows for better visualization (5 slots per row)
@@ -31,23 +35,24 @@ const ParkingLotGrid = () => {
 
       <div className="space-y-8">
         {rows.map((row, rowIndex) => (
-          <motion.div 
+          <div 
             key={rowIndex}
             className="flex flex-wrap gap-4 justify-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: rowIndex * 0.1 }}
           >
             {row.map((slot) => (
-              <ParkingSlot
+              <div 
                 key={slot.slotNumber}
-                isOccupied={slot.isOccupied}
-                size="md"
-                className="transition-all duration-300 hover:scale-105"
-                carAnimationDelay={rowIndex * 0.1}
-              />
+                onClick={() => !slot.isOccupied && onSlotSelect?.(slot)}
+                className={!slot.isOccupied ? "cursor-pointer" : ""}
+              >
+                <ParkingSlot
+                  isOccupied={slot.isOccupied}
+                  size="md"
+                  className={`transition-all duration-200 ${!slot.isOccupied ? 'hover:opacity-80' : ''}`}
+                />
+              </div>
             ))}
-          </motion.div>
+          </div>
         ))}
       </div>
       

@@ -1,16 +1,32 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParking } from "@/context/parking";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Car } from "lucide-react";
+import type { ParkingSlot } from "@/types";
 
-const ParkVehicleForm = () => {
+interface ParkVehicleFormProps {
+  selectedSlot?: ParkingSlot | null;
+  onParkingComplete?: () => void;
+}
+
+const ParkVehicleForm = ({ selectedSlot, onParkingComplete }: ParkVehicleFormProps) => {
   const [regNumber, setRegNumber] = useState("");
   const [vehicleType, setVehicleType] = useState("");
   const { parkVehicle } = useParking();
+
+  useEffect(() => {
+    if (selectedSlot?.vehicle) {
+      setRegNumber(selectedSlot.vehicle.regNumber);
+      setVehicleType(selectedSlot.vehicle.vehicleType);
+    } else {
+      setRegNumber("");
+      setVehicleType("");
+    }
+  }, [selectedSlot]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +35,11 @@ const ParkVehicleForm = () => {
       // Reset form if successful
       setRegNumber("");
       setVehicleType("");
+      
+      // Call the onParkingComplete callback if provided
+      if (onParkingComplete) {
+        onParkingComplete();
+      }
     }
   };
 
