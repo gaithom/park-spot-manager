@@ -150,7 +150,15 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center text-sm mb-4 md:mb-0">
               <Copyright size={14} className="mr-1" />
-              <span>{currentYear} ParkEase. All rights reserved.</span>
+              <span>{currentYear} ParkEase. All rights reserved. Made by </span>
+              <a 
+                href="https://github.com/gaithom" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="ml-1 font-medium hover:underline text-blue-500 hover:text-blue-600"
+              >
+                Michael Gaitho
+              </a>
             </div>
             <div className="flex space-x-6 text-sm">
               <Link to="/privacy" className={`hover:underline ${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'}`}>
