@@ -56,7 +56,11 @@ const AdminLoginPage = () => {
     setIsLoading(true);
     
     try {
-      await addUser(formData.username, formData.email, formData.password, 'admin');
+      addUser({
+        username: formData.username,
+        password: formData.password,
+        role: 'admin'
+      });
       setError('Admin account created successfully! Please log in.');
       setActiveTab('login');
       setFormData({

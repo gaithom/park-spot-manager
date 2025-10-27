@@ -7,6 +7,7 @@ import AnalyticsDashboard from "./AnalyticsDashboard"
 import VehicleCategories from "./VehicleCategories"
 import UserManagement from "./UserManagement"
 import ActiveReservations from "./ActiveReservations"
+import VehicleHistory from "./VehicleHistory"
 
 const AdminDashboard = () => {
   return (
@@ -22,6 +23,7 @@ const AdminDashboard = () => {
           <TabsTrigger value="parking" className="data-[state=active]:bg-secondary">Parking</TabsTrigger>
           <TabsTrigger value="reservations" className="data-[state=active]:bg-secondary">Reservations</TabsTrigger>
           <TabsTrigger value="analytics" className="data-[state=active]:bg-secondary">Analytics</TabsTrigger>
+          <TabsTrigger value="history" className="data-[state=active]:bg-secondary">Vehicle History</TabsTrigger>
           <TabsTrigger value="management" className="data-[state=active]:bg-secondary">Management</TabsTrigger>
         </TabsList>
         
@@ -40,6 +42,12 @@ const AdminDashboard = () => {
         <TabsContent value="analytics">
           <Card className="border-neutral-800 shadow-md">
             <AnalyticsDashboard />
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="history">
+          <Card className="border-neutral-800 shadow-md">
+            <VehicleHistory />
           </Card>
         </TabsContent>
         
