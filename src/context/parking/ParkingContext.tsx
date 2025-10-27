@@ -93,8 +93,8 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
     return loginUser(username, password, setUser);
   };
 
-  const logout = () => {
-    logoutUser(setUser);
+  const logout = (onLogout?: () => void) => {
+    logoutUser(setUser, onLogout);
   };
 
   const handleParkVehicle = (vehicle: Omit<Vehicle, "entryTime">): boolean => {

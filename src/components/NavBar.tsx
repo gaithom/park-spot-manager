@@ -14,8 +14,9 @@ const NavBar = () => {
   const [open, setOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
-    navigate("/login");
+    logout(() => {
+      navigate("/");
+    });
   };
 
   const isActive = (path: string) => location.pathname === path;

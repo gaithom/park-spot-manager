@@ -58,24 +58,51 @@ const AdminAuthModal = ({ isOpen, onClose }: AdminAuthModalProps) => {
       return;
     }
     
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    
+    // Password strength check
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
-      await addUser({
+      const userData = {
         username: formData.username,
+        email: formData.email,
         password: formData.password,
-        role: 'admin'
-      });
-      setError('Admin account created successfully! Please log in.');
+        role: 'admin',
+        createdAt: new Date().toISOString()
+      };
+      
+      await addUser(userData);
+      
+      // Show success message and switch to login tab
+      setError('');
       setActiveTab('login');
+      
       // Clear form after successful registration
       setFormData({
         email: '',
         password: '',
         username: ''
       });
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+      
+      // Show success message in the login form
+      setTimeout(() => {
+        setError('Registration successful! Please log in.');
+      }, 100);
+      
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
       console.error('Admin registration error:', err);
     } finally {
       setIsLoading(false);

@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import { useParking } from "@/context/parking";
 import { motion, AnimatePresence } from "framer-motion";
 import "./Home.module.css";
+import { ParkingLotGrid, ParkingSlot } from "@/components/ui/parking-slot";
 
 const Home = () => {
   const { theme, user } = useParking();
@@ -119,49 +120,86 @@ const Home = () => {
           <div className="absolute -bottom-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
         </div>
 
-        <div className="max-w-5xl mx-auto relative z-10 px-4">
+        <div className="max-w-7xl mx-auto relative z-10 px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="mb-8"
+            className="mb-12"
           >
-            <span className={`inline-block px-4 py-2 rounded-full text-sm font-medium mb-6 ${
-              theme === "dark" ? "bg-primary/10 text-primary" : "bg-primary/10 text-primary"
-            }`}>
-              Revolutionizing Parking Management
-            </span>
-            <h1 className={`text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r ${
-              theme === "dark" ? "from-red-400 to-purple-500" : "from-red-600 to-purple-700"
-            }`}>
-              Smart Parking, <span className="block">Simplified</span>
-            </h1>
-            <p className={`text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed ${
-              theme === "dark" ? "text-gray-300" : "text-gray-700"
-            }`}>
-              Transform your parking operations with our all-in-one solution for efficient vehicle tracking, space optimization, and seamless customer experience.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="group relative overflow-hidden">
-                <Link to={user ? "/dashboard" : "/login"} className="relative z-10">
-                  <span className="relative z-10 flex items-center">
-                    {user ? 'Go to Dashboard' : 'Get Started Free'}
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                </Link>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => scrollToSection("features")}
-                className="group"
-              >
-                <span className="flex items-center">
-                  Learn More
-                  <ChevronDown className="ml-2 h-4 w-4 transition-transform group-hover:translate-y-1" />
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+              <div className="lg:w-1/2">
+                <span className={`inline-block px-4 py-2 rounded-full text-sm font-medium mb-6 ${
+                  theme === "dark" ? "bg-primary/10 text-primary" : "bg-primary/10 text-primary"
+                }`}>
+                  Revolutionizing Parking Management
                 </span>
-              </Button>
+                <h1 className={`text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r ${
+                  theme === "dark" ? "from-green-600 to-emerald-500" : "from-green-700 to-emerald-600"
+                }`}>
+                  Smart Parking, <span className="block">Simplified</span>
+                </h1>
+                <p className={`text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                }`}>
+                  Transform your parking operations with our all-in-one solution for efficient vehicle tracking, space optimization, and seamless customer experience.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                  <Button asChild size="lg" className="group relative overflow-hidden">
+                    <Link to={user ? "/dashboard" : "/login"} className="relative z-10">
+                      <span className="relative z-10 flex items-center">
+                        {user ? 'Go to Dashboard' : 'Get Started Free'}
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => scrollToSection("features")}
+                    className="group"
+                  >
+                    <span className="flex items-center">
+                      Learn More
+                      <ChevronDown className="ml-2 h-4 w-4 transition-transform group-hover:translate-y-1" />
+                    </span>
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Parking Lot Visualization */}
+              <div className="lg:w-1/2 mt-8 lg:mt-0">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3, duration: 0.8 }}
+                  className="relative"
+                >
+                  <div className="absolute -top-4 -left-4 w-full h-full bg-primary/10 rounded-2xl -z-10" />
+                  <div className="bg-background p-6 rounded-xl border shadow-lg">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-medium text-foreground">Live Parking Status</h3>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <span className="flex items-center mr-4">
+                          <span className="w-3 h-3 rounded-full bg-green-500 mr-1"></span>
+                          <span>Available</span>
+                        </span>
+                        <span className="flex items-center">
+                          <span className="w-3 h-3 rounded-full bg-destructive/50 mr-1"></span>
+                          <span>Occupied</span>
+                        </span>
+                      </div>
+                    </div>
+                    <ParkingLotGrid slots={6} occupied={2} />
+                    <div className="mt-4 text-center">
+                      <p className="text-sm text-muted-foreground">
+                        Real-time parking availability monitoring
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </motion.div>
 

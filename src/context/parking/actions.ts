@@ -1,5 +1,4 @@
 import { ParkingSlot, Vehicle, ParkingHistory, VehicleTypeCategory, ParkingReservation, User, DailyRevenue } from "@/types";
-import { toast } from "sonner";
 import { format } from "date-fns";
 import { generateVehicleTypeDistribution } from "./utils";
 import { USER_CREDENTIALS } from "./types";
@@ -9,23 +8,20 @@ export const loginUser = (
   password: string, 
   setUser: React.Dispatch<React.SetStateAction<User>>
 ): boolean => {
-  if (username in USER_CREDENTIALS && USER_CREDENTIALS[username].password === password) {
-    setUser({ 
-      username, 
-      isLoggedIn: true, 
+  if (USER_CREDENTIALS[username] && USER_CREDENTIALS[username].password === password) {
+    setUser({
+      username,
+      isLoggedIn: true,
       role: USER_CREDENTIALS[username].role 
     });
-    toast.success("Login successful!");
     return true;
-  } else {
-    toast.error("Invalid credentials. Please try again.");
-    return false;
   }
+  return false;
 };
 
-export const logoutUser = (setUser: React.Dispatch<React.SetStateAction<User>>) => {
+export const logoutUser = (setUser: React.Dispatch<React.SetStateAction<User>>, onLogout?: () => void) => {
   setUser({ username: "", isLoggedIn: false, role: undefined });
-  toast.info("You have been logged out.");
+  if (onLogout) onLogout();
 };
 
 export const parkVehicle = (
@@ -34,7 +30,6 @@ export const parkVehicle = (
   setSlots: React.Dispatch<React.SetStateAction<ParkingSlot[]>>
 ): boolean => {
   if (!vehicle.regNumber || !vehicle.vehicleType) {
-    toast.error("Please fill out both fields!");
     return false;
   }
 
@@ -44,7 +39,6 @@ export const parkVehicle = (
   );
 
   if (isAlreadyParked) {
-    toast.error(`Vehicle ${vehicle.regNumber} is already parked.`);
     return false;
   }
 
@@ -52,7 +46,6 @@ export const parkVehicle = (
   const availableSlotIndex = slots.findIndex(slot => !slot.isOccupied && !slot.isReserved);
   
   if (availableSlotIndex === -1) {
-    toast.warning("No available slots!");
     return false;
   }
 
@@ -68,7 +61,6 @@ export const parkVehicle = (
   };
 
   setSlots(newSlots);
-  toast.success(`Vehicle ${vehicle.regNumber} parked at Slot ${newSlots[availableSlotIndex].slotNumber}.`);
   return true;
 };
 
@@ -83,7 +75,6 @@ export const removeVehicle = (
   setDailyRevenue: React.Dispatch<React.SetStateAction<DailyRevenue[]>>
 ): { success: boolean; fee?: number } => {
   if (!regNumber) {
-    toast.error("Please enter the registration number!");
     return { success: false };
   }
 
@@ -93,7 +84,6 @@ export const removeVehicle = (
   );
 
   if (slotIndex === -1) {
-    toast.warning(`Vehicle ${regNumber} not found in the parking lot.`);
     return { success: false };
   }
 
@@ -152,7 +142,6 @@ export const removeVehicle = (
   }
   setDailyRevenue(updatedRevenue);
 
-  toast.success(`Vehicle ${regNumber} removed. Total Fee: ksh ${fee.toFixed(2)}`);
   return { success: true, fee };
 };
 
@@ -162,18 +151,15 @@ export const addVehicleCategory = (
   setVehicleTypeCategories: React.Dispatch<React.SetStateAction<VehicleTypeCategory[]>>
 ): boolean => {
   if (!category.name || category.hourlyRate <= 0) {
-    toast.error("Please provide a valid category name and rate!");
     return false;
   }
 
   // Check if category already exists
   if (vehicleTypeCategories.some(c => c.name.toLowerCase() === category.name.toLowerCase())) {
-    toast.error(`Category ${category.name} already exists!`);
     return false;
   }
 
   setVehicleTypeCategories([...vehicleTypeCategories, { ...category, count: 0 }]);
-  toast.success(`Vehicle category ${category.name} added successfully!`);
   return true;
 };
 
@@ -188,24 +174,20 @@ export const makeReservation = (
   
   // Validate inputs
   if (!slotNumber || !regNumber || !reservedFor || !startTime || !endTime) {
-    toast.error("Please fill out all fields!");
     return false;
   }
 
   if (startTime >= endTime) {
-    toast.error("End time must be after start time!");
     return false;
   }
 
   // Check if the slot exists and is available
   const slotIndex = slots.findIndex(s => s.slotNumber === slotNumber);
   if (slotIndex === -1) {
-    toast.error("Invalid slot number!");
     return false;
   }
 
   if (slots[slotIndex].isOccupied || slots[slotIndex].isReserved) {
-    toast.error(`Slot ${slotNumber} is not available for reservation!`);
     return false;
   }
 
@@ -231,7 +213,6 @@ export const makeReservation = (
 
   setSlots(newSlots);
   setReservations([...reservations, newReservation]);
-  toast.success(`Slot ${slotNumber} reserved for ${reservedFor} successfully!`);
   return true;
 };
 
@@ -244,7 +225,6 @@ export const cancelReservation = (
 ): boolean => {
   const reservationIndex = reservations.findIndex(r => r.id === id);
   if (reservationIndex === -1) {
-    toast.error("Reservation not found!");
     return false;
   }
 
@@ -271,7 +251,6 @@ export const cancelReservation = (
 
   setReservations(newReservations);
   setSlots(newSlots);
-  toast.success(`Reservation for slot ${reservation.slotNumber} cancelled!`);
   return true;
 };
 
@@ -286,12 +265,10 @@ export const addUser = (
   user: { username: string; password: string; role: string }
 ): boolean => {
   if (!user.username || !user.password) {
-    toast.error("Please provide both username and password!");
     return false;
   }
 
   if (user.username in USER_CREDENTIALS) {
-    toast.error(`User ${user.username} already exists!`);
     return false;
   }
 
@@ -299,7 +276,6 @@ export const addUser = (
     password: user.password, 
     role: user.role as "admin" | "attendant" 
   };
-  toast.success(`User ${user.username} added successfully as ${user.role}!`);
   return true;
 };
 

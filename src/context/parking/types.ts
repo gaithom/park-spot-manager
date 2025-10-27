@@ -39,7 +39,7 @@ export interface ParkingContextType {
   theme: "light" | "dark";
   toggleTheme: () => void;
   login: (username: string, password: string) => boolean;
-  logout: () => void;
+  logout: (onLogout?: () => void) => void;
   parkVehicle: (vehicle: Omit<Vehicle, "entryTime">) => boolean;
   removeVehicle: (regNumber: string) => { success: boolean; fee?: number };
   addVehicleCategory: (category: Omit<VehicleTypeCategory, "count">) => boolean;
