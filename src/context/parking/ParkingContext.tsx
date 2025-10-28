@@ -13,7 +13,7 @@ import {
 import { 
   loginUser, logoutUser, parkVehicle, removeVehicle, 
   addVehicleCategory, makeReservation, cancelReservation, 
-  getVehicleHistory, addUser, updateVehicleDistribution 
+  getVehicleHistory, addUser, updateVehicleDistribution, updateProfile 
 } from "./actions";
 import { generateDailyRevenue, generateVehicleTypeDistribution } from "./utils";
 
@@ -25,7 +25,11 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
   const [reservations, setReservations] = useState<ParkingReservation[]>(initialReservations);
   const [vehicleTypeCategories, setVehicleTypeCategories] = useState<VehicleTypeCategory[]>(initialVehicleCategories);
   const [user, setUser] = useState<User>(() => {
-    const savedUser = localStorage.getItem("parkingUser");
+    // First check sessionStorage, then localStorage for user data
+    const sessionUser = sessionStorage.getItem('parkingUser');
+    if (sessionUser) return JSON.parse(sessionUser);
+    
+    const savedUser = localStorage.getItem('parkingUser');
     return savedUser ? JSON.parse(savedUser) : { username: "", isLoggedIn: false, role: undefined };
   });
   // Add theme state
@@ -89,6 +93,20 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Create wrapper functions to abstract the implementation details
+  const handleAddUser = (user: { username: string; password: string; role: string }) => {
+    return addUser(user);
+  };
+
+  const handleUpdateProfile = async (userData: { 
+    name?: string; 
+    email?: string; 
+    phone?: string; 
+    currentPassword?: string; 
+    newPassword?: string 
+  }) => {
+    return updateProfile(userData, user, setUser);
+  };
+
   const login = (username: string, password: string): boolean => {
     return loginUser(username, password, setUser);
   };
@@ -148,6 +166,7 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
       parkVehicle: handleParkVehicle,
       removeVehicle: handleRemoveVehicle,
       addVehicleCategory: handleAddVehicleCategory,
+      updateProfile: (userData) => updateProfile(userData, user, setUser),
       makeReservation: handleMakeReservation,
       cancelReservation: handleCancelReservation,
       getVehicleHistory: handleGetVehicleHistory,

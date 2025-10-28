@@ -12,10 +12,29 @@ import {
 
 export const TOTAL_SLOTS = 50;
 
+// Define user credentials type with additional fields
+type UserCredentials = {
+  password: string;
+  role: "admin" | "attendant";
+  name?: string;
+  email?: string;
+  phone?: string;
+};
+
 // Add the missing USER_CREDENTIALS export
-export const USER_CREDENTIALS: Record<string, { password: string; role: "admin" | "attendant" }> = {
-  "admin": { password: "password123", role: "admin" },
-  "attendant": { password: "password123", role: "attendant" }
+export const USER_CREDENTIALS: Record<string, UserCredentials> = {
+  "admin": { 
+    password: "password123", 
+    role: "admin",
+    name: "Admin User",
+    email: "admin@example.com"
+  },
+  "attendant": { 
+    password: "password123", 
+    role: "attendant",
+    name: "Attendant User",
+    email: "attendant@example.com"
+  }
 };
 
 // Add the missing INITIAL_VEHICLE_CATEGORIES export
@@ -47,4 +66,11 @@ export interface ParkingContextType {
   cancelReservation: (id: string) => boolean;
   getVehicleHistory: (regNumber: string) => ParkingHistory[];
   addUser: (user: { username: string; password: string; role: string }) => boolean;
+  updateProfile: (userData: { 
+    name?: string; 
+    email?: string; 
+    phone?: string; 
+    currentPassword?: string; 
+    newPassword?: string 
+  }) => Promise<boolean>;
 }

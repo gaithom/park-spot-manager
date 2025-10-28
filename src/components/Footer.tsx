@@ -36,8 +36,8 @@ const Footer = () => {
   ];
 
   const contactInfo = [
-    { icon: <MapPin size={16} className="mr-2" />, text: '123 Parking Ave, City, Country' },
-    { icon: <Phone size={16} className="mr-2" />, text: '+1 (555) 123-4567' },
+    { icon: <MapPin size={16} className="mr-2" />, text: 'Nakuru, Kenya' },
+    { icon: <Phone size={16} className="mr-2" />, text: '+254 798600033' },
     { icon: <Mail size={16} className="mr-2" />, text: 'support@parkease.com' },
     { icon: <Clock size={16} className="mr-2" />, text: 'Mon - Fri: 9:00 - 18:00' },
   ];
@@ -69,7 +69,7 @@ const Footer = () => {
                 { icon: <Facebook size={18} />, label: 'Facebook', url: 'https://facebook.com' },
                 { icon: <Twitter size={18} />, label: 'Twitter', url: 'https://twitter.com' },
                 { icon: <Instagram size={18} />, label: 'Instagram', url: 'https://instagram.com' },
-                { icon: <Linkedin size={18} />, label: 'LinkedIn', url: 'https://linkedin.com' },
+                { icon: <Linkedin size={18} />, label: 'LinkedIn', url: 'https://www.linkedin.com/in/michael-gaitho-99b02a355/' },
               ].map((social, index) => (
                 <a
                   key={index}

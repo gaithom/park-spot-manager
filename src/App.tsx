@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import AvailableSlots from "./pages/AvailableSlots";
 import Analytics from "./pages/Analytics";
 import Reservations from "./pages/Reservations";
+import ProfileSettings from "./pages/ProfileSettings";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index"; // Optional
@@ -69,6 +70,24 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Reservations />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfileSettings />
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/profile/settings"
+              element={
+                <ProtectedRoute>
+                  <ProfileSettings />
                 </ProtectedRoute>
               }
             />

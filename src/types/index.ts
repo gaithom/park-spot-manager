@@ -18,6 +18,9 @@ export interface ParkingSlot {
 
 export interface User {
   username: string;
+  name?: string;
+  email?: string;
+  phone?: string;
   isLoggedIn: boolean;
   role?: "admin" | "attendant";
 }

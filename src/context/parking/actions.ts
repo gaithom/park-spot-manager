@@ -6,21 +6,57 @@ import { USER_CREDENTIALS } from "./types";
 export const loginUser = (
   username: string, 
   password: string, 
-  setUser: React.Dispatch<React.SetStateAction<User>>
+  setUser: React.Dispatch<React.SetStateAction<User>>,
+  rememberMe: boolean = false
 ): boolean => {
-  if (USER_CREDENTIALS[username] && USER_CREDENTIALS[username].password === password) {
-    setUser({
+  // Get credentials from localStorage or fallback to initial USER_CREDENTIALS
+  const storedCredentials = localStorage.getItem('parkingUserCredentials');
+  const credentials = storedCredentials ? JSON.parse(storedCredentials) : { ...USER_CREDENTIALS };
+  
+  // Check credentials
+  if (credentials[username] && 
+      credentials[username].password === password &&
+      (credentials[username].role === 'admin' || credentials[username].role === 'attendant')) {
+    
+    const userRole = credentials[username].role;
+    const userData = {
       username,
       isLoggedIn: true,
-      role: USER_CREDENTIALS[username].role 
-    });
+      role: userRole,
+      name: credentials[username].name || username,
+      email: credentials[username].email || '',
+      phone: credentials[username].phone || ''
+    };
+    
+    setUser(userData);
+    
+    // Save user data to localStorage
+    if (rememberMe) {
+      localStorage.setItem('parkingUser', JSON.stringify(userData));
+      
+      // Save credentials if not already saved
+      if (!storedCredentials) {
+        localStorage.setItem('parkingUserCredentials', JSON.stringify(credentials));
+      }
+    } else {
+      // Only store in sessionStorage if not remembering
+      sessionStorage.setItem('parkingUser', JSON.stringify(userData));
+    }
+    
     return true;
   }
   return false;
 };
 
 export const logoutUser = (setUser: React.Dispatch<React.SetStateAction<User>>, onLogout?: () => void) => {
+  // Clear user data from both localStorage and sessionStorage
+  localStorage.removeItem('parkingUser');
+  sessionStorage.removeItem('parkingUser');
+  
+  // Reset user state
   setUser({ username: "", isLoggedIn: false, role: undefined });
+  
+  // Execute any additional logout logic
   if (onLogout) onLogout();
 };
 
@@ -261,22 +297,105 @@ export const getVehicleHistory = (
   return parkingHistory.filter(record => record.regNumber === regNumber);
 };
 
+export const updateProfile = (
+  userData: { name?: string; email?: string; phone?: string; currentPassword?: string; newPassword?: string },
+  currentUser: User,
+  setUser: React.Dispatch<React.SetStateAction<User>>
+): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    try {
+      // Get current credentials from localStorage or fallback to initial USER_CREDENTIALS
+      const storedCredentials = localStorage.getItem('parkingUserCredentials');
+      const credentials = storedCredentials ? JSON.parse(storedCredentials) : { ...USER_CREDENTIALS };
+      
+      // Check if password change is requested
+      if (userData.newPassword) {
+        if (!userData.currentPassword) {
+          throw new Error('Current password is required to change password');
+        }
+        
+        // Verify current password
+        const userCreds = credentials[currentUser.username];
+        if (!userCreds || userCreds.password !== userData.currentPassword) {
+          throw new Error('Current password is incorrect');
+        }
+        
+        // Update password in credentials
+        credentials[currentUser.username] = {
+          ...userCreds,
+          password: userData.newPassword
+        };
+        
+        // Save updated credentials
+        localStorage.setItem('parkingUserCredentials', JSON.stringify(credentials));
+      }
+      
+      // Update user profile in USER_CREDENTIALS
+      if (credentials[currentUser.username]) {
+        credentials[currentUser.username] = {
+          ...credentials[currentUser.username],
+          name: userData.name !== undefined ? userData.name : currentUser.name,
+          email: userData.email !== undefined ? userData.email : currentUser.email,
+          phone: userData.phone !== undefined ? userData.phone : currentUser.phone,
+        };
+        
+        // Save updated credentials
+        localStorage.setItem('parkingUserCredentials', JSON.stringify(credentials));
+      }
+      
+      // Update the user's profile in state and localStorage
+      const updatedUser = {
+        ...currentUser,
+        name: userData.name !== undefined ? userData.name : currentUser.name,
+        email: userData.email !== undefined ? userData.email : currentUser.email,
+        phone: userData.phone !== undefined ? userData.phone : currentUser.phone,
+      };
+      
+      setUser(updatedUser);
+      localStorage.setItem('parkingUser', JSON.stringify(updatedUser));
+      
+      resolve(true);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      reject(error);
+    }
+  });
+};
+
 export const addUser = (
-  user: { username: string; password: string; role: string }
+  user: { username: string; password: string; role?: string; name?: string; email?: string; phone?: string }
 ): boolean => {
   if (!user.username || !user.password) {
     return false;
   }
 
-  if (user.username in USER_CREDENTIALS) {
+  try {
+    // Get existing credentials from localStorage or use default ones
+    const storedCredentials = localStorage.getItem('parkingUserCredentials');
+    const credentials = storedCredentials ? JSON.parse(storedCredentials) : { ...USER_CREDENTIALS };
+
+    // Check if user already exists
+    if (credentials[user.username]) {
+      return false;
+    }
+
+    // Add new user with provided or default values
+    credentials[user.username] = {
+      password: user.password,
+      role: user.role || 'attendant',
+      name: user.name || user.username,
+      email: user.email || '',
+      phone: user.phone || ''
+    };
+
+    // Save updated credentials to localStorage
+    localStorage.setItem('parkingUserCredentials', JSON.stringify(credentials));
+    
+    return true;
+  } catch (error) {
+    console.error('Error adding user:', error);
     return false;
   }
-
-  USER_CREDENTIALS[user.username] = { 
-    password: user.password, 
-    role: user.role as "admin" | "attendant" 
-  };
-  return true;
 };
 
 export const updateVehicleDistribution = (

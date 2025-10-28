@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Car, UserPlus, Eye, EyeOff } from "lucide-react";
 import { useParking } from "@/context/parking";
 import { toast } from "sonner";
@@ -16,7 +15,6 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [role, setRole] = useState<"admin" | "attendant">("attendant");
   const { addUser } = useParking();
   const navigate = useNavigate();
 
@@ -28,7 +26,7 @@ const Register = () => {
       return;
     }
 
-    const success = addUser({ username, password, role });
+    const success = addUser({ username, password, role: 'attendant' });
     if (success) {
       toast.success("Registration successful! Please log in.");
       navigate("/login");
@@ -115,20 +113,7 @@ const Register = () => {
                 </button>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label className="text-foreground">User Role</Label>
-              <RadioGroup value={role} onValueChange={(value) => setRole(value as "admin" | "attendant")}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="admin" id="registration-admin" />
-                  <Label htmlFor="registration-admin">Admin</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="attendant" id="registration-attendant" />
-                  <Label htmlFor="registration-attendant">Attendant</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full mt-4">
               Register
             </Button>
           </form>

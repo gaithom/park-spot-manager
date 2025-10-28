@@ -1,19 +1,111 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { ChevronDown, Check, Clock, BarChart, Shield, Zap, Cloud, ArrowRight, Star, Quote, ChevronLeft, ChevronRight, ChevronUp, Car, Settings, CreditCard, User } from "lucide-react";
+import { ChevronDown, Check, Clock, BarChart, Shield, Zap, Cloud, ArrowRight, Star, Quote, ChevronLeft, ChevronRight, ChevronUp, Car, Settings, CreditCard, User, Lock, AlertCircle } from "lucide-react";
 import HomeNavBar from "@/components/HomeNavBar";
 import Footer from "@/components/Footer";
 import { useParking } from "@/context/parking";
 import { motion, AnimatePresence } from "framer-motion";
 import "./Home.module.css";
 import { ParkingLotGrid, ParkingSlot } from "@/components/ui/parking-slot";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { addUser } from "@/context/parking/actions";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Home = () => {
-  const { theme, user } = useParking();
+  const { theme, user, login } = useParking();
   const [isHovered, setIsHovered] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [clickCount, setClickCount] = useState(0);
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [adminCredentials, setAdminCredentials] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+    name: '',
+    email: ''
+  });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+    
+    if (newCount === 4) {
+      setShowAdminAuth(true);
+      setClickCount(0);
+    } else if (newCount === 1) {
+      // Reset counter after 3 seconds if no more clicks
+      setTimeout(() => {
+        setClickCount(0);
+      }, 3000);
+    }
+  };
+
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    if (isRegistering) {
+      if (adminCredentials.password !== adminCredentials.confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+      
+      // Register new admin
+      const success = addUser({
+        username: adminCredentials.username,
+        password: adminCredentials.password,
+        role: 'admin',
+        name: adminCredentials.name,
+        email: adminCredentials.email
+      });
+      
+      if (success) {
+        toast.success('Admin registration successful. Please log in.');
+        setIsRegistering(false);
+        setAdminCredentials({
+          username: '',
+          password: '',
+          confirmPassword: '',
+          name: '',
+          email: ''
+        });
+      } else {
+        setError('Username already exists');
+      }
+    } else {
+      // Login existing admin
+      const success = login(adminCredentials.username, adminCredentials.password);
+      if (success && user.role === 'admin') {
+        setShowAdminAuth(false);
+        setAdminCredentials({ username: '', password: '', confirmPassword: '', name: '', email: '' });
+        navigate('/dashboard');
+        toast.success('Admin login successful');
+      } else {
+        setError('Invalid admin credentials');
+        toast.error('Invalid admin credentials');
+      }
+    }
+  };
+
+  const toggleAuthMode = () => {
+    setIsRegistering(!isRegistering);
+    setError('');
+    setAdminCredentials({
+      username: '',
+      password: '',
+      confirmPassword: '',
+      name: '',
+      email: ''
+    });
+  };
   
   const testimonials = [
     {
@@ -106,8 +198,123 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-background">
       <HomeNavBar />
+      
+      {/* Admin Auth Modal */}
+      <Dialog open={showAdminAuth} onOpenChange={(open) => {
+        if (!open) {
+          setAdminCredentials({ username: '', password: '', confirmPassword: '', name: '', email: '' });
+          setError('');
+        }
+        setShowAdminAuth(open);
+      }}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <div className="flex flex-col items-center space-y-2 mb-6">
+              <div className="p-3 rounded-full bg-primary/10">
+                <Lock className="h-8 w-8 text-primary" />
+              </div>
+              <DialogTitle className="text-2xl">
+                {isRegistering ? 'Admin Registration' : 'Admin Sign In'}
+              </DialogTitle>
+              <DialogDescription className="text-center text-sm">
+                {isRegistering 
+                  ? 'Register a new admin account' 
+                  : 'Enter your admin credentials to access the dashboard'}
+              </DialogDescription>
+            </div>
+          </DialogHeader>
+          
+          {error && (
+            <div className="bg-destructive/15 p-3 rounded-md flex items-start space-x-2 text-destructive text-sm mb-4">
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+          
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            {isRegistering && (
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  placeholder="John Doe"
+                  value={adminCredentials.name}
+                  onChange={(e) => setAdminCredentials({...adminCredentials, name: e.target.value})}
+                  required={isRegistering}
+                />
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                placeholder="admin"
+                value={adminCredentials.username}
+                onChange={(e) => setAdminCredentials({...adminCredentials, username: e.target.value})}
+                required
+              />
+            </div>
+            
+            {isRegistering && (
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@example.com"
+                  value={adminCredentials.email}
+                  onChange={(e) => setAdminCredentials({...adminCredentials, email: e.target.value})}
+                  required={isRegistering}
+                />
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={adminCredentials.password}
+                onChange={(e) => setAdminCredentials({...adminCredentials, password: e.target.value})}
+                required
+              />
+            </div>
+            
+            {isRegistering && (
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  value={adminCredentials.confirmPassword}
+                  onChange={(e) => setAdminCredentials({...adminCredentials, confirmPassword: e.target.value})}
+                  required={isRegistering}
+                />
+              </div>
+            )}
+            
+            <Button type="submit" className="w-full mt-2">
+              {isRegistering ? 'Register' : 'Sign In'}
+            </Button>
+            
+            <div className="text-center text-sm text-muted-foreground">
+              {isRegistering ? 'Already have an account? ' : 'Need an admin account? '}
+              <button
+                type="button"
+                onClick={toggleAuthMode}
+                className="text-primary hover:underline underline-offset-4"
+              >
+                {isRegistering ? 'Sign in' : 'Register'}
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Hero Section */}
       <section id="hero" className={`min-h-screen flex flex-col items-center justify-center text-center px-4 relative overflow-hidden ${
@@ -140,7 +347,7 @@ const Home = () => {
                   Smart Parking, <span className="block">Simplified</span>
                 </h1>
                 <p className={`text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                  theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}>
                   Transform your parking operations with our all-in-one solution for efficient vehicle tracking, space optimization, and seamless customer experience.
                 </p>
