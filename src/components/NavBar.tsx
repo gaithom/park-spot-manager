@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogOut, Car, Menu, BarChart2, Calendar, Layers, Home, User, Settings, ChevronDown, Lock, AlertCircle } from "lucide-react";
+import { LogOut, Car, Menu, BarChart2, Calendar, Layers, Home, User, Settings, ChevronDown, Lock, AlertCircle, UserPlus } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
@@ -27,7 +27,7 @@ import {
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
 const NavBar = () => {
-  const { logout, user, login } = useParking();
+  const { logout, user, login, addUser } = useParking();
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -35,9 +35,12 @@ const NavBar = () => {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [adminCredentials, setAdminCredentials] = useState({
     username: '',
-    password: ''
+    email: '',
+    password: '',
+    confirmPassword: ''
   });
   const [error, setError] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -49,30 +52,114 @@ const NavBar = () => {
     return () => clearTimeout(timer);
   }, [clickCount]);
 
-  useEffect(() => {
-    if (clickCount >= 4) {
-      setShowAdminModal(true);
-      setClickCount(0);
-    }
-  }, [clickCount]);
+  // Removed the separate effect for showing admin modal
+  // Now handled directly in handleLogoClick
 
   const handleLogoClick = () => {
-    setClickCount(prev => prev + 1);
+    // Only increment count if not already showing admin modal
+    if (!showAdminModal) {
+      const newCount = clickCount + 1;
+      setClickCount(newCount);
+      
+      // If this was the 4th click, show admin modal
+      if (newCount === 4) {
+        setShowAdminModal(true);
+        setClickCount(0); // Reset counter after showing modal
+      }
+    }
   };
 
-  const handleAdminLogin = async (e: React.FormEvent) => {
+  const handleAdminAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    const success = login(adminCredentials.username, adminCredentials.password);
-    if (success && user.role === 'admin') {
-      setShowAdminModal(false);
-      setAdminCredentials({ username: '', password: '' });
-      navigate('/dashboard');
-      toast.success('Admin login successful');
+    if (isRegistering) {
+      // Handle registration
+      if (adminCredentials.password !== adminCredentials.confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+      
+      if (!adminCredentials.email || !adminCredentials.username || !adminCredentials.password) {
+        setError('All fields are required');
+        return;
+      }
+      
+      try {
+        // Register the new admin user
+        const newUser = {
+          username: adminCredentials.username.trim(),
+          password: adminCredentials.password,
+          email: adminCredentials.email,
+          role: 'admin',
+          name: adminCredentials.username.trim(),
+          phone: ''
+        };
+        
+        const success = addUser(newUser);
+        
+        if (success) {
+          toast.success('Admin registration successful! You can now log in.');
+          
+          // Reset form and switch to login
+          setAdminCredentials({ 
+            username: newUser.username, // Keep the username filled for convenience
+            email: '', 
+            password: '',
+            confirmPassword: '' 
+          });
+          setIsRegistering(false);
+        } else {
+          setError('Registration failed. Username may already exist.');
+        }
+      } catch (err) {
+        setError('Registration failed. Please try again.');
+        console.error('Admin registration error:', err);
+      }
     } else {
-      setError('Invalid admin credentials');
-      toast.error('Invalid admin credentials');
+      // Handle login
+      const storedCredentials = localStorage.getItem('parkingUserCredentials');
+      const credentials = storedCredentials ? JSON.parse(storedCredentials) : {};
+      
+      // Trim the username to handle any accidental spaces
+      const username = adminCredentials.username.trim();
+      const userEntry = Object.entries(credentials).find(
+        ([key, value]: [string, any]) => 
+          key.trim() === username && 
+          value.password === adminCredentials.password
+      );
+      
+      if (userEntry) {
+        const [storedUsername, userData] = userEntry as [string, { role: string; name?: string; email?: string; password: string }];
+        
+        // Ensure the role is set to 'admin' for admin users
+        const userRole = storedUsername.toLowerCase().includes('admin') ? 'admin' : userData.role;
+        
+        // Manually set the user data in localStorage
+        const userToStore = {
+          username: storedUsername,
+          isLoggedIn: true,
+          role: userRole, // Use the determined role
+          name: userData.name || storedUsername,
+          email: userData.email || ''
+        };
+        
+        // Store user data in both localStorage and sessionStorage for consistency
+        localStorage.setItem('parkingUser', JSON.stringify(userToStore));
+        sessionStorage.setItem('parkingUser', JSON.stringify(userToStore));
+        
+        // Force a state update by reloading the page
+        if (userRole === 'admin') {
+          window.location.href = '/dashboard?admin=true';
+        } else {
+          window.location.href = '/dashboard';
+        }
+        return;
+      }
+      
+      // If we get here, login failed
+      setError('Invalid username or password');
+      toast.error('Invalid credentials. Please try again.');
     }
   };
 
@@ -239,23 +326,33 @@ const NavBar = () => {
         </div>
       </div>
 
-      {/* Admin Login Modal */}
+      {/* Admin Auth Modal */}
       <Dialog open={showAdminModal} onOpenChange={(open) => {
         if (!open) {
-          setAdminCredentials({ username: '', password: '' });
+          setAdminCredentials({ 
+            username: '',
+            email: '',
+            password: '',
+            confirmPassword: '' 
+          });
           setError('');
+          setIsRegistering(false);
         }
         setShowAdminModal(open);
       }}>
-        <DialogContent className="sm:max-w-[400px]">
+        <DialogContent className="sm:max-w-[450px]">
           <DialogHeader>
             <div className="flex flex-col items-center space-y-2 mb-6">
               <div className="p-3 rounded-full bg-primary/10">
                 <Lock className="h-8 w-8 text-primary" />
               </div>
-              <DialogTitle className="text-2xl">Admin Sign In</DialogTitle>
+              <DialogTitle className="text-2xl">
+                {isRegistering ? 'Register Admin' : 'Admin Sign In'}
+              </DialogTitle>
               <DialogDescription className="text-center text-sm">
-                Enter your admin credentials to access the dashboard
+                {isRegistering 
+                  ? 'Create a new admin account'
+                  : 'Enter your admin credentials to access the dashboard'}
               </DialogDescription>
             </div>
           </DialogHeader>
@@ -267,9 +364,30 @@ const NavBar = () => {
             </div>
           )}
           
-          <form onSubmit={handleAdminLogin} className="space-y-4">
+          <form onSubmit={handleAdminAuth} className="space-y-4">
+            {isRegistering && (
+              <div className="space-y-2">
+                <Label htmlFor="admin-email">Email</Label>
+                <Input
+                  id="admin-email"
+                  type="email"
+                  value={adminCredentials.email}
+                  onChange={(e) => {
+                    setError('');
+                    setAdminCredentials({...adminCredentials, email: e.target.value});
+                  }}
+                  placeholder="Enter your email"
+                  className="h-11"
+                  required
+                  autoComplete="email"
+                />
+              </div>
+            )}
+            
             <div className="space-y-2">
-              <Label htmlFor="admin-username">Admin Username</Label>
+              <Label htmlFor="admin-username">
+                {isRegistering ? 'Choose a Username' : 'Username'}
+              </Label>
               <Input
                 id="admin-username"
                 value={adminCredentials.username}
@@ -277,25 +395,29 @@ const NavBar = () => {
                   setError('');
                   setAdminCredentials({...adminCredentials, username: e.target.value});
                 }}
-                placeholder="Enter admin username"
+                placeholder={isRegistering ? "Choose a username" : "Enter your username"}
                 className="h-11"
                 required
-                autoComplete="username"
+                autoComplete={isRegistering ? "username" : "current-username"}
               />
             </div>
             
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="admin-password">Password</Label>
-                <button 
-                  type="button"
-                  onClick={() => {
-                    toast.info('Please contact system administrator to reset your password');
-                  }}
-                  className="text-xs text-muted-foreground hover:underline"
-                >
-                  Forgot password?
-                </button>
+                <Label htmlFor="admin-password">
+                  {isRegistering ? 'Choose a Password' : 'Password'}
+                </Label>
+                {!isRegistering && (
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      toast.info('Please contact system administrator to reset your password');
+                    }}
+                    className="text-xs text-muted-foreground hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                )}
               </div>
               <Input
                 id="admin-password"
@@ -305,17 +427,73 @@ const NavBar = () => {
                   setError('');
                   setAdminCredentials({...adminCredentials, password: e.target.value});
                 }}
-                placeholder="Enter your password"
+                placeholder={isRegistering ? "Create a strong password" : "Enter your password"}
                 className="h-11"
                 required
-                autoComplete="current-password"
+                autoComplete={isRegistering ? "new-password" : "current-password"}
               />
             </div>
             
+            {isRegistering && (
+              <div className="space-y-2">
+                <Label htmlFor="admin-confirm-password">Confirm Password</Label>
+                <Input
+                  id="admin-confirm-password"
+                  type="password"
+                  value={adminCredentials.confirmPassword}
+                  onChange={(e) => {
+                    setError('');
+                    setAdminCredentials({...adminCredentials, confirmPassword: e.target.value});
+                  }}
+                  placeholder="Confirm your password"
+                  className="h-11"
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
+            )}
+            
             <Button type="submit" className="w-full h-11 mt-2">
-              Sign In to Admin Dashboard
+              {isRegistering ? 'Register Admin' : 'Sign In to Admin Dashboard'}
             </Button>
-          </form> 
+            
+            <div className="text-center text-sm mt-4">
+              {isRegistering ? (
+                <p className="text-muted-foreground">
+                  Already have an account?{' '}
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setError('');
+                      setIsRegistering(false);
+                      setAdminCredentials({
+                        ...adminCredentials,
+                        email: '',
+                        confirmPassword: ''
+                      });
+                    }}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Sign in instead
+                  </button>
+                </p>
+              ) : (
+                <p className="text-muted-foreground">
+                  Need an admin account?{' '}
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setError('');
+                      setIsRegistering(true);
+                    }}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Register here
+                  </button>
+                </p>
+              )}
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </header>
