@@ -49,6 +49,10 @@ export interface ParkingReservation {
   startTime: Date;
   endTime: Date;
   status: "active" | "completed" | "cancelled";
+  paymentId?: string;
+  amount?: number;
+  paymentStatus?: 'pending' | 'succeeded' | 'failed';
+  paymentDate?: Date;
 }
 
 export interface DailyRevenue {

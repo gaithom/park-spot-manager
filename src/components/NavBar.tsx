@@ -4,9 +4,15 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogOut, Car, Menu, BarChart2, Calendar, Layers, Home, User, Settings, ChevronDown, Lock, AlertCircle, UserPlus } from "lucide-react";
+import { LogOut, Car, Menu, BarChart2, Calendar, Layers, Home, User, Settings, ChevronDown, Lock, AlertCircle, UserPlus, CreditCard } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import PaymentModal from "./PaymentModal";
+
+// Initialize Stripe
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 import ThemeToggle from "./ThemeToggle";
 import { toast } from "sonner";
 import {
@@ -28,6 +34,7 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 
 const NavBar = () => {
   const { logout, user, login, addUser } = useParking();
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
@@ -281,47 +288,51 @@ const NavBar = () => {
           )}
 
           <div className="hidden md:flex items-center space-x-4">
+            {user.isLoggedIn && (
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => setShowPaymentModal(true)}
+              >
+                <CreditCard className="h-4 w-4" />
+                <span>Make Payment</span>
+              </Button>
+            )}
             <ThemeToggle />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>
-                      {user?.name?.charAt(0).toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <ChevronDown className="ml-1 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user?.name || 'User'}</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email || ''}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="w-full cursor-pointer">
+            {user.isLoggedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{user.name?.charAt(0) || user.username.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/profile/settings" className="w-full cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="md:hidden" onClick={() => setShowPaymentModal(true)}>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    <span>Make Payment</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    logout();
+                    navigate("/login");
+                  }}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="outline" onClick={() => navigate("/login")}>
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -496,6 +507,24 @@ const NavBar = () => {
           </form>
         </DialogContent>
       </Dialog>
+      {user.isLoggedIn && (
+        <Elements stripe={stripePromise}>
+          <PaymentModal
+            isOpen={showPaymentModal}
+            onClose={() => setShowPaymentModal(false)}
+            amount={0}
+            onSuccess={(paymentIntent) => {
+              toast.success('Payment successful!');
+              setShowPaymentModal(false);
+            }}
+            onError={(error) => {
+              toast.error(`Payment failed: ${error}`);
+            }}
+            vehicleType=""
+            duration=""
+          />
+        </Elements>
+      )}
     </header>
   );
 };
