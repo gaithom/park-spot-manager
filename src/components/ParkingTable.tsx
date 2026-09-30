@@ -1,104 +1,147 @@
+import { useMemo, useState } from "react";
+import { ParkingSquare, Search } from "lucide-react";
 
-import { useState } from 'react';
 import { useParking } from "@/context/parking";
-import { formatDateTime } from "@/lib/utils";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { CheckCircle, XCircle, ChevronDown, ChevronUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useNow } from "@/hooks/use-now";
+import { formatDuration, formatShortDateTime } from "@/lib/utils";
+import { bayStatus } from "@/components/parking/ParkingBay";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Input } from "@/components/ui/input";
+import {
+  Panel,
+  PanelActions,
+  PanelDescription,
+  PanelHeader,
+  PanelHeading,
+  PanelIcon,
+  PanelTitle,
+} from "@/components/ui/panel";
+import { Plate } from "@/components/ui/plate";
+import { StatusPill } from "@/components/ui/status-pill";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+type Filter = "occupied" | "available" | "all";
 
 const ParkingTable = () => {
-  const { slots, theme } = useParking();
-  const [showAvailable, setShowAvailable] = useState(false);
+  const { slots } = useParking();
+  const now = useNow(30_000);
+  const [filter, setFilter] = useState<Filter>("occupied");
+  const [query, setQuery] = useState("");
 
-  // Separate occupied and available slots
-  const occupiedSlots = slots.filter(slot => slot.isOccupied);
-  const availableSlots = slots.filter(slot => !slot.isOccupied);
+  const rows = useMemo(() => {
+    const term = query.trim().toLowerCase();
 
-  // Always show occupied slots, conditionally show available slots
-  const displaySlots = showAvailable 
-    ? [...occupiedSlots, ...availableSlots]
-    : [...occupiedSlots];
+    return slots
+      .filter((slot) => {
+        if (filter === "occupied" && !slot.isOccupied) return false;
+        if (filter === "available" && slot.isOccupied) return false;
+        if (!term) return true;
+        return (
+          slot.vehicle?.regNumber?.toLowerCase().includes(term) ||
+          String(slot.slotNumber).includes(term)
+        );
+      })
+      .sort((a, b) => a.slotNumber - b.slotNumber);
+  }, [slots, filter, query]);
 
   return (
-    <div className={`rounded-lg border ${theme === 'dark' ? 'border-gray-800 bg-gray-900' : 'border-neutral-200 bg-white'} shadow-sm overflow-hidden`}>
-      <div className={`relative after:absolute after:bottom-0 after:left-0 after:right-0 after:h-8 ${
-        theme === 'dark' 
-          ? 'after:from-gray-900' 
-          : 'after:from-background'
-      } after:bg-gradient-to-t after:to-transparent after:pointer-events-none`}>
+    <Panel>
+      <PanelHeader>
+        <PanelHeading>
+          <PanelIcon>
+            <ParkingSquare />
+          </PanelIcon>
+          <div className="min-w-0">
+            <PanelTitle>Bay register</PanelTitle>
+            <PanelDescription>
+              {rows.length} of {slots.length} bays shown
+            </PanelDescription>
+          </div>
+        </PanelHeading>
+
+        <PanelActions>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Plate or bay"
+              aria-label="Search by registration or bay number"
+              className="h-8 w-40 pl-8 text-[13px]"
+            />
+          </div>
+
+          <Tabs value={filter} onValueChange={(value) => setFilter(value as Filter)}>
+            <TabsList variant="segmented">
+              <TabsTrigger value="occupied">Occupied</TabsTrigger>
+              <TabsTrigger value="available">Free</TabsTrigger>
+              <TabsTrigger value="all">All</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </PanelActions>
+      </PanelHeader>
+
+      {rows.length === 0 ? (
+        <EmptyState
+          icon={ParkingSquare}
+          title="Nothing to show"
+          description={
+            query
+              ? `No bay or registration matches “${query}”.`
+              : "No bays match this filter right now."
+          }
+        />
+      ) : (
         <Table>
-          <TableHeader className={theme === 'dark' ? 'bg-gray-800' : 'bg-secondary'}>
-            <TableRow className={theme === 'dark' ? 'border-b border-gray-700' : 'border-b border-neutral-200'}>
-              <TableHead className={theme === 'dark' ? 'text-gray-300' : 'text-white'}>Slot</TableHead>
-              <TableHead className={theme === 'dark' ? 'text-gray-300' : 'text-white'}>Status</TableHead>
-              <TableHead className={theme === 'dark' ? 'text-gray-300' : 'text-white'}>Registration</TableHead>
-              <TableHead className={theme === 'dark' ? 'text-gray-300' : 'text-white'}>Vehicle Type</TableHead>
-              <TableHead className={theme === 'dark' ? 'text-gray-300' : 'text-white'}>Entry Time</TableHead>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-16">Bay</TableHead>
+              <TableHead className="w-32">Status</TableHead>
+              <TableHead>Registration</TableHead>
+              <TableHead>Vehicle type</TableHead>
+              <TableHead>Entry</TableHead>
+              <TableHead className="text-right">Duration</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {displaySlots.map((slot) => (
-              <TableRow 
-                key={slot.slotNumber} 
-                className={`${slot.isOccupied 
-                  ? theme === 'dark' ? 'bg-gray-800/50' : 'bg-muted' 
-                  : ''} ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}`}
-              >
-                <TableCell className={`font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-foreground'}`}>
-                  {slot.slotNumber}
+            {rows.map((slot) => (
+              <TableRow key={slot.slotNumber}>
+                <TableCell className="font-mono text-xs font-semibold text-muted-foreground">
+                  {String(slot.slotNumber).padStart(2, "0")}
                 </TableCell>
                 <TableCell>
-                  {slot.isOccupied ? (
-                    <div className="flex items-center text-destructive">
-                      <XCircle className="mr-1 h-4 w-4" /> 
-                      <span className={theme === 'dark' ? 'text-red-400' : ''}>Occupied</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <CheckCircle className="mr-1 h-4 w-4 text-green-500" /> 
-                      <span className={theme === 'dark' ? 'text-green-400' : 'text-green-600'}>Available</span>
-                    </div>
-                  )}
+                  <StatusPill status={bayStatus(slot)} />
                 </TableCell>
-                <TableCell className={theme === 'dark' ? 'text-gray-300' : 'text-foreground'}>
-                  {slot.vehicle?.regNumber || "—"}
+                <TableCell>
+                  <Plate value={slot.vehicle?.regNumber} />
                 </TableCell>
-                <TableCell className={theme === 'dark' ? 'text-gray-300' : 'text-foreground'}>
+                <TableCell className="text-muted-foreground">
                   {slot.vehicle?.vehicleType || "—"}
                 </TableCell>
-                <TableCell className={theme === 'dark' ? 'text-gray-300' : 'text-foreground'}>
-                  {slot.vehicle?.entryTime 
-                    ? formatDateTime(slot.vehicle.entryTime) 
+                <TableCell className="whitespace-nowrap text-muted-foreground">
+                  {slot.vehicle?.entryTime
+                    ? formatShortDateTime(slot.vehicle.entryTime)
+                    : "—"}
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  {slot.vehicle?.entryTime
+                    ? formatDuration(slot.vehicle.entryTime, now)
                     : "—"}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </div>
-      {availableSlots.length > 0 && (
-        <div className="flex justify-center mt-2 p-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className={`${theme === 'dark' ? 'text-gray-400 hover:text-gray-200' : 'text-muted-foreground hover:text-foreground'} transition-colors`}
-            onClick={() => setShowAvailable(!showAvailable)}
-          >
-            {showAvailable ? (
-              <>
-                <ChevronUp className="mr-1 h-4 w-4" />
-                Hide Available Slots
-              </>
-            ) : (
-              <>
-                <ChevronDown className="mr-1 h-4 w-4" />
-                Show Available Slots ({availableSlots.length})
-              </>
-            )}
-          </Button>
-        </div>
       )}
-    </div>
+    </Panel>
   );
 };
 

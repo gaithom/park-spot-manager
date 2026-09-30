@@ -1,96 +1,149 @@
-
 import { useState } from "react";
-import { useParking } from "@/context/parking";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatDateTime } from "@/lib/utils";
 import { History, Search } from "lucide-react";
+
+import { useParking } from "@/context/parking";
+import type { ParkingHistory } from "@/types";
+import { formatDuration, formatMoney, formatShortDateTime } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Input } from "@/components/ui/input";
+import {
+  Panel,
+  PanelBody,
+  PanelDescription,
+  PanelHeader,
+  PanelHeading,
+  PanelIcon,
+  PanelTitle,
+} from "@/components/ui/panel";
+import { Plate } from "@/components/ui/plate";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const VehicleHistory = () => {
   const [searchReg, setSearchReg] = useState("");
-  interface VehicleHistoryRecord {
-    id: string;
-    slotNumber: string;
-    entryTime: string;
-    exitTime: string;
-    fee: number;
-  }
-
-  const [searchResults, setSearchResults] = useState<VehicleHistoryRecord[]>([]);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [results, setResults] = useState<ParkingHistory[]>([]);
+  const [searchedFor, setSearchedFor] = useState<string | null>(null);
   const { getVehicleHistory } = useParking();
 
-  const handleSearch = () => {
-    if (!searchReg.trim()) return;
-    
-    const results = getVehicleHistory(searchReg.trim());
-    setSearchResults(
-      results.map((record) => ({
-        ...record,
-        slotNumber: record.slotNumber.toString(),
-        entryTime: record.entryTime.toISOString(),
-        exitTime: record.exitTime.toISOString(),
-      }))
-    );
-    setHasSearched(true);
+  const handleSearch = (event: React.FormEvent) => {
+    event.preventDefault();
+    const term = searchReg.trim();
+    if (!term) return;
+
+    setResults(getVehicleHistory(term));
+    setSearchedFor(term);
   };
 
-  return (
-    <Card className="w-full bg-background border-neutral-700/20">
-      <CardHeader className="bg-secondary/30 border-b border-neutral-700/20">
-        <CardTitle className="flex items-center">
-          <History className="mr-2 h-5 w-5" /> Vehicle History
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <div className="flex items-center space-x-2 mb-6">
-          <Input
-            placeholder="Enter vehicle registration"
-            value={searchReg}
-            onChange={(e) => setSearchReg(e.target.value)}
-            className="bg-secondary border-neutral-700/20"
-          />
-          <Button onClick={handleSearch}>
-            <Search className="h-4 w-4 mr-2" /> Search
-          </Button>
-        </div>
+  const totalCharged = results.reduce((sum, record) => sum + record.fee, 0);
 
-        {hasSearched && (
-          <div className="rounded-md border border-neutral-700/20 overflow-hidden">
-            <Table>
-              <TableHeader className="bg-secondary">
-                <TableRow className="border-b border-neutral-700/20">
-                  <TableHead>Slot</TableHead>
-                  <TableHead>Entry Time</TableHead>
-                  <TableHead>Exit Time</TableHead>
-                  <TableHead>Fee (ksh)</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {searchResults.length > 0 ? (
-                  searchResults.map((record) => (
-                    <TableRow key={record.id}>
-                      <TableCell className="text-foreground">{record.slotNumber}</TableCell>
-                      <TableCell className="text-foreground">{formatDateTime(record.entryTime)}</TableCell>
-                      <TableCell className="text-foreground">{formatDateTime(record.exitTime)}</TableCell>
-                      <TableCell className="text-foreground">{record.fee.toFixed(2)}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
+  return (
+    <Panel>
+      <PanelHeader>
+        <PanelHeading>
+          <PanelIcon>
+            <History />
+          </PanelIcon>
+          <div>
+            <PanelTitle>Vehicle history</PanelTitle>
+            <PanelDescription>
+              Every closed visit for a registration
+            </PanelDescription>
+          </div>
+        </PanelHeading>
+      </PanelHeader>
+
+      <PanelBody className="space-y-5">
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={searchReg}
+              onChange={(event) => setSearchReg(event.target.value.toUpperCase())}
+              placeholder="KBZ 123A"
+              aria-label="Vehicle registration"
+              className="pl-9 font-mono uppercase tracking-wider"
+            />
+          </div>
+          <Button type="submit" variant="outline">
+            Search
+          </Button>
+        </form>
+
+        {searchedFor === null ? (
+          <EmptyState
+            size="sm"
+            icon={Search}
+            title="Search a registration"
+            description="Enter a plate to see every completed visit, duration and fee."
+          />
+        ) : results.length === 0 ? (
+          <EmptyState
+            size="sm"
+            icon={History}
+            title="No visits found"
+            description={`Nothing recorded for ${searchedFor} yet.`}
+          />
+        ) : (
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Plate value={searchedFor} />
+              <p className="text-xs text-muted-foreground">
+                <span data-numeric className="font-semibold text-foreground">
+                  {results.length}
+                </span>{" "}
+                {results.length === 1 ? "visit" : "visits"} · KSh{" "}
+                <span data-numeric className="font-semibold text-foreground">
+                  {formatMoney(totalCharged)}
+                </span>{" "}
+                charged
+              </p>
+            </div>
+
+            <div className="overflow-hidden rounded-lg border">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
-                      No history found for this vehicle.
-                    </TableCell>
+                    <TableHead className="w-16">Bay</TableHead>
+                    <TableHead>Entry</TableHead>
+                    <TableHead>Exit</TableHead>
+                    <TableHead className="text-right">Duration</TableHead>
+                    <TableHead className="text-right">Fee</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {results.map((record) => (
+                    <TableRow key={record.id}>
+                      <TableCell className="font-mono text-xs font-semibold text-muted-foreground">
+                        {String(record.slotNumber).padStart(2, "0")}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-muted-foreground">
+                        {formatShortDateTime(record.entryTime)}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-muted-foreground">
+                        {formatShortDateTime(record.exitTime)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatDuration(record.entryTime, new Date(record.exitTime))}
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">
+                        KSh {formatMoney(record.fee)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </PanelBody>
+    </Panel>
   );
 };
 

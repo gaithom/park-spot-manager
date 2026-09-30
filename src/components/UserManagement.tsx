@@ -1,86 +1,157 @@
-
 import { useState } from "react";
+import { ShieldCheck, UserCog, Users } from "lucide-react";
+import { toast } from "sonner";
+
 import { useParking } from "@/context/parking";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Users } from "lucide-react";
+import {
+  Panel,
+  PanelBody,
+  PanelDescription,
+  PanelHeader,
+  PanelHeading,
+  PanelIcon,
+  PanelTitle,
+} from "@/components/ui/panel";
+
+type Role = "admin" | "attendant";
+
+const roles: { value: Role; label: string; description: string; icon: React.ElementType }[] = [
+  {
+    value: "attendant",
+    label: "Attendant",
+    description: "Records entries, exits and payments",
+    icon: UserCog,
+  },
+  {
+    value: "admin",
+    label: "Administrator",
+    description: "Full access including rates and analytics",
+    icon: ShieldCheck,
+  },
+];
 
 const UserManagement = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"admin" | "attendant">("attendant");
+  const [role, setRole] = useState<Role>("attendant");
   const { addUser, user } = useParking();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (addUser({ username, password, role })) {
-      // Reset form if successful
-      setUsername("");
-      setPassword("");
-      setRole("attendant");
-    }
-  };
-
-  // Only admin can add users
+  // Only administrators can create accounts.
   if (user.role !== "admin") {
     return null;
   }
 
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!addUser({ username, password, role })) {
+      toast.error(`Username “${username}” is already taken`);
+      return;
+    }
+
+    toast.success(`${username} added as ${role}`);
+    setUsername("");
+    setPassword("");
+    setRole("attendant");
+  };
+
   return (
-    <Card className="w-full bg-background border-neutral-700/20">
-      <CardHeader className="bg-secondary/30 border-b border-neutral-700/20">
-        <CardTitle className="flex items-center">
-          <Users className="mr-2 h-5 w-5" /> User Management
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6">
+    <Panel>
+      <PanelHeader>
+        <PanelHeading>
+          <PanelIcon>
+            <Users />
+          </PanelIcon>
+          <div>
+            <PanelTitle>Team access</PanelTitle>
+            <PanelDescription>Create accounts for staff</PanelDescription>
+          </div>
+        </PanelHeading>
+      </PanelHeader>
+
+      <PanelBody>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="username" className="text-foreground">Username</Label>
-            <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="New username"
-              className="bg-secondary border-neutral-700/20"
-              required
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="new-username">Username</Label>
+              <Input
+                id="new-username"
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                placeholder="j.wanjiru"
+                autoComplete="off"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="new-password">Temporary password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="••••••••"
+                autoComplete="new-password"
+                required
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="New password"
-              className="bg-secondary border-neutral-700/20"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-foreground">User Role</Label>
-            <RadioGroup value={role} onValueChange={(value) => setRole(value as "admin" | "attendant")}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="admin" id="admin" className="border-neutral-400" />
-                <Label htmlFor="admin" className="text-foreground">Admin</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="attendant" id="attendant" className="border-neutral-400" />
-                <Label htmlFor="attendant" className="text-foreground">Attendant</Label>
-              </div>
-            </RadioGroup>
-          </div>
-          <Button type="submit" className="w-full">
-            Add User
+
+          <fieldset className="space-y-2">
+            <legend className="mb-2 text-[13px] font-medium text-foreground">
+              Role
+            </legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {roles.map((option) => {
+                const active = role === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setRole(option.value)}
+                    aria-pressed={active}
+                    className={cn(
+                      "flex items-start gap-2.5 rounded-lg border p-3 text-left transition-colors",
+                      active
+                        ? "border-primary bg-primary-subtle"
+                        : "hover:border-strong hover:bg-muted/60"
+                    )}
+                  >
+                    <option.icon
+                      className={cn(
+                        "mt-0.5 h-4 w-4 shrink-0",
+                        active ? "text-primary" : "text-muted-foreground"
+                      )}
+                    />
+                    <span className="min-w-0">
+                      <span
+                        className={cn(
+                          "block text-[13px] font-medium",
+                          active ? "text-primary" : "text-foreground"
+                        )}
+                      >
+                        {option.label}
+                      </span>
+                      <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">
+                        {option.description}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          <Button type="submit" variant="outline" className="w-full sm:w-auto">
+            Create account
           </Button>
         </form>
-      </CardContent>
-    </Card>
+      </PanelBody>
+    </Panel>
   );
 };
 

@@ -1,59 +1,61 @@
+import { Activity, Car, CheckCircle2, ParkingSquare } from "lucide-react";
 
-import { useParking } from "@/context/parking";
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { Car, CircleSlash, Sparkles } from "lucide-react";
-
-const StatCard = ({
-  title,
-  value,
-  icon: Icon,
-  className,
-}: {
-  title: string;
-  value: number | string;
-  icon: React.ElementType;
-  className?: string;
-}) => (
-  <Card className={cn("shadow-sm bg-background border-primary/20", className)}>
-    <CardContent className="p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <h3 className="mt-1 text-2xl font-bold tracking-tight text-foreground">{value}</h3>
-        </div>
-        <div className={cn("rounded-full p-2", className)}>
-          <Icon className="h-5 w-5 text-primary" />
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
+import { useCapacity } from "@/hooks/use-capacity";
+import { Meter } from "@/components/ui/meter";
+import { StatTile } from "@/components/ui/stat-tile";
 
 const ParkingStats = () => {
-  const { availableSlots, totalSlots } = useParking();
-  const occupiedSlots = totalSlots - availableSlots;
+  const { total, available, occupied, reserved, occupancyRate } = useCapacity();
+  const availableShare = total > 0 ? Math.round((available / total) * 100) : 0;
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <StatCard
-        title="Total Slots"
-        value={totalSlots}
-        icon={Sparkles}
-        className="bg-background border-primary/30"
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <StatTile
+        label="Total capacity"
+        value={total}
+        icon={ParkingSquare}
+        tone="neutral"
+        hint="Bays across the facility"
       />
-      <StatCard
-        title="Available Slots"
-        value={availableSlots}
+
+      <StatTile
+        label="Available now"
+        value={available}
+        icon={CheckCircle2}
+        tone="success"
+        hint={`${availableShare}% of capacity ready to fill`}
+      />
+
+      <StatTile
+        label="Occupied"
+        value={occupied}
         icon={Car}
-        className="bg-background border-primary/30"
+        tone="primary"
+        hint={
+          reserved > 0
+            ? `${reserved} further ${reserved === 1 ? "bay" : "bays"} held on reservation`
+            : "No bays held on reservation"
+        }
       />
-      <StatCard
-        title="Occupied Slots"
-        value={occupiedSlots}
-        icon={CircleSlash}
-        className="bg-background border-primary/30"
-      />
+
+      <StatTile
+        label="Occupancy"
+        value={occupancyRate}
+        unit="%"
+        icon={Activity}
+        tone={occupancyRate >= 90 ? "warning" : "info"}
+      >
+        <Meter
+          size="sm"
+          showLegend={false}
+          total={total}
+          segments={[
+            { label: "Occupied", value: occupied, color: "bg-foreground/70" },
+            { label: "Reserved", value: reserved, color: "bg-brass" },
+            { label: "Available", value: available, color: "bg-success" },
+          ]}
+        />
+      </StatTile>
     </div>
   );
 };

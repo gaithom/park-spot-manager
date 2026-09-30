@@ -1,51 +1,80 @@
-
 import { useState } from "react";
+import { LogOut } from "lucide-react";
+import { toast } from "sonner";
+
 import { useParking } from "@/context/parking";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { formatMoney } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { CarTaxiFront } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Panel,
+  PanelBody,
+  PanelDescription,
+  PanelHeader,
+  PanelHeading,
+  PanelIcon,
+  PanelTitle,
+} from "@/components/ui/panel";
 
 const RemoveVehicleForm = () => {
   const [regNumber, setRegNumber] = useState("");
   const { removeVehicle } = useParking();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
     const result = removeVehicle(regNumber);
+
     if (result.success) {
+      toast.success(`${regNumber} released`, {
+        description:
+          result.fee !== undefined
+            ? `Parking fee: KSh ${formatMoney(result.fee)}`
+            : undefined,
+      });
       setRegNumber("");
+      return;
     }
+
+    toast.error(`No parked vehicle found with registration ${regNumber}`);
   };
 
   return (
-    <Card className="w-full bg-background border-primary/20">
-      <CardHeader className="bg-destructive/10 border-b border-primary/20">
-        <CardTitle className="flex items-center text-destructive">
-          <CarTaxiFront className="mr-2 h-5 w-5" /> Remove Vehicle
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6">
+    <Panel>
+      <PanelHeader>
+        <PanelHeading>
+          <PanelIcon className="bg-muted text-muted-foreground">
+            <LogOut />
+          </PanelIcon>
+          <div>
+            <PanelTitle>Record exit</PanelTitle>
+            <PanelDescription>Frees the bay and closes the ticket</PanelDescription>
+          </div>
+        </PanelHeading>
+      </PanelHeader>
+
+      <PanelBody>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="removeRegNumber" className="text-foreground">Vehicle Registration Number</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="removeRegNumber">Registration number</Label>
             <Input
               id="removeRegNumber"
               value={regNumber}
-              onChange={(e) => setRegNumber(e.target.value)}
-              placeholder="Enter registration number"
-              className="bg-secondary border-primary/20"
+              onChange={(event) => setRegNumber(event.target.value.toUpperCase())}
+              placeholder="KBZ 123A"
+              className="font-mono uppercase tracking-wider"
+              autoComplete="off"
               required
             />
           </div>
-          <Button type="submit" variant="destructive" className="w-full">
-            Remove Vehicle
+
+          <Button type="submit" variant="outline" className="w-full">
+            Release bay &amp; calculate fee
           </Button>
         </form>
-      </CardContent>
-    </Card>
+      </PanelBody>
+    </Panel>
   );
 };
 

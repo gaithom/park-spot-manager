@@ -1,93 +1,84 @@
+import { useState } from "react";
+import { LayoutGrid, List } from "lucide-react";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { LayoutGrid, List } from "lucide-react"
-import { useState } from "react"
-import ParkingStats from "./ParkingStats"
-import ParkingTable from "./ParkingTable"
-import ParkingGrid from "./ParkingGrid"
-import AnalyticsDashboard from "./AnalyticsDashboard"
-import VehicleCategories from "./VehicleCategories"
-import UserManagement from "./UserManagement"
-import ActiveReservations from "./ActiveReservations"
-import VehicleHistory from "./VehicleHistory"
+import ActiveReservations from "./ActiveReservations";
+import AnalyticsDashboard from "./AnalyticsDashboard";
+import DailyRevenueSummary from "./DailyRevenueSummary";
+import ParkingGrid from "./ParkingGrid";
+import ParkingStats from "./ParkingStats";
+import ParkingTable from "./ParkingTable";
+import UserManagement from "./UserManagement";
+import VehicleCategories from "./VehicleCategories";
+import VehicleHistory from "./VehicleHistory";
+import { Panel } from "@/components/ui/panel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AdminDashboard = () => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
-  
+  const [tab, setTab] = useState("bays");
+  const [view, setView] = useState<"table" | "map">("table");
+
   return (
     <div className="space-y-6">
-      <div className="mb-8">
-        <Card className="border-neutral-800 shadow-lg">
-          <ParkingStats />
-        </Card>
-      </div>
+      <ParkingStats />
 
-      <Tabs defaultValue="parking" className="bg-black/5 p-6 rounded-lg">
-        <div className="flex justify-between items-center mb-6">
-          <TabsList className="bg-background">
-            <TabsTrigger value="parking" className="data-[state=active]:bg-secondary">Parking</TabsTrigger>
-            <TabsTrigger value="reservations" className="data-[state=active]:bg-secondary">Reservations</TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-secondary">Analytics</TabsTrigger>
-            <TabsTrigger value="history" className="data-[state=active]:bg-secondary">Vehicle History</TabsTrigger>
-            <TabsTrigger value="management" className="data-[state=active]:bg-secondary">Management</TabsTrigger>
+      <Tabs value={tab} onValueChange={setTab}>
+        {/* Section tabs and the view switch share one baseline rule. */}
+        <div className="flex items-end gap-4 border-b">
+          <TabsList variant="underline" className="flex-1 border-b-0">
+            <TabsTrigger value="bays">Bays</TabsTrigger>
+            <TabsTrigger value="reservations">Reservations</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="management">Management</TabsTrigger>
           </TabsList>
-          
-          <div className="flex space-x-2">
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-              className="h-8"
+
+          {tab === "bays" ? (
+            <Tabs
+              value={view}
+              onValueChange={(value) => setView(value as "table" | "map")}
+              className="hidden pb-2 sm:block"
             >
-              <LayoutGrid className="h-4 w-4 mr-2" />
-              Grid
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-              className="h-8"
-            >
-              <List className="h-4 w-4 mr-2" />
-              List
-            </Button>
-          </div>
+              <TabsList variant="segmented">
+                <TabsTrigger value="table">
+                  <List />
+                  Table
+                </TabsTrigger>
+                <TabsTrigger value="map">
+                  <LayoutGrid />
+                  Map
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          ) : null}
         </div>
-        
-        <TabsContent value="parking" className="space-y-6">
-          <Card className="shadow-sm border-neutral-800 overflow-hidden">
-            {viewMode === 'list' ? <ParkingTable /> : <ParkingGrid />}
-          </Card>
+
+        <TabsContent value="bays" className="mt-5">
+          {view === "table" ? (
+            <ParkingTable />
+          ) : (
+            <Panel>
+              <ParkingGrid />
+            </Panel>
+          )}
         </TabsContent>
-        
-        <TabsContent value="reservations">
-          <Card className="border-neutral-800 shadow-md">
-            <ActiveReservations />
-          </Card>
+
+        <TabsContent value="reservations" className="mt-5">
+          <ActiveReservations />
         </TabsContent>
-        
-        <TabsContent value="analytics">
-          <Card className="border-neutral-800 shadow-md">
-            <AnalyticsDashboard />
-          </Card>
+
+        <TabsContent value="analytics" className="mt-5 space-y-4">
+          <DailyRevenueSummary />
+          <AnalyticsDashboard />
         </TabsContent>
-        
-        <TabsContent value="history">
-          <Card className="border-neutral-800 shadow-md">
-            <VehicleHistory />
-          </Card>
+
+        <TabsContent value="history" className="mt-5">
+          <VehicleHistory />
         </TabsContent>
-        
-        <TabsContent value="management" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="border-neutral-800 shadow-md">
-              <VehicleCategories />
-            </Card>
-            <Card className="border-neutral-800 shadow-md">
-              <UserManagement />
-            </Card>
+
+        <TabsContent value="management" className="mt-5">
+          <div className="grid gap-4 xl:grid-cols-2">
+            <VehicleCategories />
+            <UserManagement />
           </div>
         </TabsContent>
       </Tabs>

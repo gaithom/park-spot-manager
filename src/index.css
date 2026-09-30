@@ -1,101 +1,172 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+  ParkEase design tokens.
+
+  Neutrals carry a faint green cast so the brand green never looks pasted onto
+  a grey UI. Surfaces are layered (sunken < background < surface) so panels read
+  as floating forward without needing heavy shadows.
+
+  Status language, used consistently in the parking map, tables and pills:
+    available -> brand green, outlined
+    occupied  -> solid ink fill (a taken bay, not an error)
+    reserved  -> brass, dashed
+*/
+
 @layer base {
   :root {
-    /* Modern color palette */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
+    color-scheme: light;
 
-    /* Primary colors - Dark Green */
-    --primary: 160 84% 24%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 160 84% 30%;
-    
-    /* Secondary colors - Slightly lighter green */
-    --secondary: 160 60% 35%;
-    --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 160 60% 42%;
-    
-    /* Accent colors - Gold for contrast */
-    --accent: 42 100% 50%;
-    --accent-foreground: 0 0% 10%;
-    --accent-hover: 42 100% 60%;
-    
-    /* Status colors */
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    
-    --danger: 0 84% 60%;
-    --danger-foreground: 0 0% 100%;
+    /* Surfaces */
+    --background: 152 20% 98%;
+    --surface: 0 0% 100%;
+    --surface-sunken: 152 18% 96%;
+    --foreground: 166 24% 10%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
-    
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
-    
+    --card-foreground: 166 24% 10%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    
-    --border: 160 20% 90%;
-    --input: 160 20% 90%;
-    --ring: 160 84% 24%;
-    
-    --radius: 0.5rem;
-    
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --popover-foreground: 166 24% 10%;
+
+    /* Quiet neutrals. `secondary` is a neutral surface, never the brand green. */
+    --muted: 152 16% 95%;
+    --muted-foreground: 158 8% 42%;
+    --secondary: 152 16% 95%;
+    --secondary-foreground: 166 20% 20%;
+
+    /* Brand */
+    --primary: 158 66% 25%;
+    --primary-foreground: 150 40% 98%;
+    --primary-subtle: 158 42% 94%;
+
+    /* `accent` keeps its shadcn meaning: the neutral hover / active surface. */
+    --accent: 152 16% 95%;
+    --accent-foreground: 166 20% 20%;
+
+    /* Brass. Used sparingly — reserved bays, highlights, marketing emphasis. */
+    --brass: 38 90% 44%;
+    --brass-foreground: 30 45% 12%;
+    --brass-subtle: 40 88% 93%;
+
+    /* Status */
+    --success: 152 56% 30%;
+    --success-foreground: 150 40% 98%;
+    --success-subtle: 152 44% 93%;
+
+    --warning: 34 88% 42%;
+    --warning-foreground: 30 45% 12%;
+    --warning-subtle: 38 90% 94%;
+
+    --danger: 358 60% 47%;
+    --danger-foreground: 0 0% 100%;
+    --danger-subtle: 358 70% 96%;
+
+    --destructive: 358 60% 47%;
+    --destructive-foreground: 0 0% 100%;
+
+    --info: 205 66% 40%;
+    --info-foreground: 0 0% 100%;
+    --info-subtle: 205 70% 95%;
+
+    /*
+      Categorical chart ramp. Deliberately separate from the status colours so a
+      pie slice can never be mistaken for "this segment is in trouble".
+    */
+    --chart-1: 158 62% 27%;
+    --chart-2: 188 48% 36%;
+    --chart-3: 38 84% 46%;
+    --chart-4: 208 48% 45%;
+    --chart-5: 132 26% 47%;
+    --chart-6: 20 42% 48%;
+
+    /* Lines and focus */
+    --border: 152 14% 89%;
+    --border-strong: 152 12% 80%;
+    --input: 152 14% 86%;
+    --ring: 158 56% 32%;
+
+    /* Navigation chrome */
+    --sidebar: 152 18% 96%;
+    --sidebar-foreground: 166 24% 10%;
+    --sidebar-muted: 158 8% 44%;
+    --sidebar-border: 152 14% 89%;
+    --sidebar-active: 0 0% 100%;
+
+    --radius: 0.625rem;
+    --shadow-tint: 166 32% 12%;
   }
 
   .dark {
-    --background: 0 0% 12%;
-    --foreground: 0 0% 98%;
-    
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 98%;
-    
-    --popover: 0 0% 15%;
-    --popover-foreground: 0 0% 98%;
-    
-    --muted: 160 20% 20%;
-    --muted-foreground: 0 0% 90%;
-    
-    --border: 160 20% 25%;
-    --input: 160 20% 25%;
-    --ring: 160 84% 35%;
-    
-    --primary: 160 84% 35%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 160 84% 42%;
-    
-    --secondary: 160 60% 25%;
-    --secondary-foreground: 0 0% 98%;
-    --secondary-hover: 160 60% 32%;
-    
-    --accent: 42 100% 60%;
-    --accent-foreground: 0 0% 10%;
-    --accent-hover: 42 100% 70%;
-    
-    --success: 142 76% 46%;
-    --success-foreground: 0 0% 100%;
-    
-    --warning: 38 92% 60%;
-    --warning-foreground: 0 0% 100%;
-    
-    --danger: 0 84% 60%;
+    color-scheme: dark;
+
+    --background: 168 18% 7%;
+    --surface: 168 15% 10%;
+    --surface-sunken: 168 20% 5%;
+    --foreground: 150 14% 96%;
+
+    --card: 168 15% 10%;
+    --card-foreground: 150 14% 96%;
+
+    --popover: 168 16% 11%;
+    --popover-foreground: 150 14% 96%;
+
+    --muted: 168 12% 15%;
+    --muted-foreground: 152 9% 63%;
+    --secondary: 168 12% 15%;
+    --secondary-foreground: 150 14% 92%;
+
+    --primary: 156 54% 46%;
+    --primary-foreground: 166 45% 7%;
+    --primary-subtle: 158 40% 15%;
+
+    --accent: 168 12% 15%;
+    --accent-foreground: 150 14% 92%;
+
+    --brass: 38 88% 58%;
+    --brass-foreground: 30 50% 10%;
+    --brass-subtle: 38 45% 16%;
+
+    --success: 152 50% 45%;
+    --success-foreground: 166 45% 7%;
+    --success-subtle: 152 40% 14%;
+
+    --warning: 36 86% 56%;
+    --warning-foreground: 30 50% 10%;
+    --warning-subtle: 36 50% 14%;
+
+    --danger: 358 66% 58%;
     --danger-foreground: 0 0% 100%;
-    
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.25);
-    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.25), 0 2px 4px -2px rgb(0 0 0 / 0.25);
-    --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.25), 0 4px 6px -4px rgb(0 0 0 / 0.25);
+    --danger-subtle: 358 40% 16%;
+
+    --destructive: 358 66% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --info: 205 70% 58%;
+    --info-foreground: 205 60% 8%;
+    --info-subtle: 205 45% 16%;
+
+    --chart-1: 156 52% 48%;
+    --chart-2: 186 46% 55%;
+    --chart-3: 38 86% 60%;
+    --chart-4: 208 58% 62%;
+    --chart-5: 132 32% 58%;
+    --chart-6: 20 52% 60%;
+
+    --border: 168 10% 18%;
+    --border-strong: 168 10% 27%;
+    --input: 168 10% 21%;
+    --ring: 156 50% 42%;
+
+    --sidebar: 168 20% 5%;
+    --sidebar-foreground: 150 14% 94%;
+    --sidebar-muted: 152 9% 60%;
+    --sidebar-border: 168 12% 14%;
+    --sidebar-active: 168 14% 12%;
+
+    --shadow-tint: 168 60% 2%;
   }
 }
 
@@ -103,82 +174,117 @@
   * {
     @apply border-border;
   }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    scroll-behavior: smooth;
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Headings set their own rhythm; callers control spacing. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-semibold tracking-tight text-foreground;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: hsl(var(--primary) / 0.18);
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-muted-foreground/70;
+  }
+
+  /* Numeric data should never jitter between renders. */
+  th,
+  td,
+  time,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-/* Animation for scroll reveal */
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
+@layer components {
+  /*
+    Thin, themed scrollbars. Chrome gets ::-webkit, Firefox gets the standard
+    properties — both fall back to the native bar if unsupported.
+  */
+  .scrollbar-slim {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border-strong)) transparent;
   }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-/* Animation for section transitions */
-@keyframes slide-in {
-  0% {
-    opacity: 0;
-    transform: translateX(100%);
+  .scrollbar-slim::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
 
-@keyframes slide-out {
-  0% {
-    opacity: 1;
-    transform: translateX(0);
+  .scrollbar-slim::-webkit-scrollbar-track {
+    background: transparent;
   }
-  100% {
-    opacity: 0;
-    transform: translateX(-100%);
+
+  .scrollbar-slim::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border-strong));
+    border: 2px solid transparent;
+    background-clip: content-box;
+    border-radius: 9999px;
+  }
+
+  .scrollbar-slim::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground) / 0.6);
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.6s ease-out forwards;
-}
+@layer utilities {
+  /* Faint blueprint grid for hero and empty surfaces. */
+  .bg-blueprint {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.7) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.7) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
 
-.animate-slide-in {
-  animation: slide-in 0.5s ease-out forwards;
-  position: absolute;
-  width: 100%;
-  top: 0;
-}
+  .bg-dotgrid {
+    background-image: radial-gradient(
+      hsl(var(--border-strong) / 0.9) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
+  }
 
-.animate-slide-out {
-  animation: slide-out 0.5s ease-out forwards;
-  position: absolute;
-  width: 100%;
-  top: 0;
-}
+  /* Fades the bottom of a scrolling region instead of cutting rows off hard. */
+  .mask-fade-b {
+    mask-image: linear-gradient(to bottom, black 82%, transparent 100%);
+  }
 
-/* Make the scroll transition smoother */
-html {
-  scroll-behavior: smooth;
-}
+  .text-balance {
+    text-wrap: balance;
+  }
 
-/* Improve button interaction */
-.scroll-button {
-  transition: transform 0.2s ease;
-}
-
-.scroll-button:hover {
-  transform: scale(1.1);
-}
-
-/* Section positioning for overlay effect */
-section {
-  position: relative;
-  width: 100%;
-  min-height: 90vh;
+  .text-pretty {
+    text-wrap: pretty;
+  }
 }

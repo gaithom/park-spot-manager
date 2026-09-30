@@ -1,13 +1,13 @@
-
-import { useState, FormEvent, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useParking } from "@/context/parking";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Car, Eye, EyeOff } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+
+import { useParking } from "@/context/parking";
+import AuthLayout from "@/components/layout/AuthLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -17,16 +17,15 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to dashboard if already logged in
     if (user.isLoggedIn) {
       navigate("/dashboard");
     }
   }, [user.isLoggedIn, navigate]);
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const success = login(username, password);
-    if (success) {
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+
+    if (login(username, password)) {
       navigate("/dashboard");
     } else {
       toast.error("Invalid username or password");
@@ -34,75 +33,78 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 bg-slate-100">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-2">
-            <div className="rounded-full bg-primary/10 p-3">
-              <Car className="h-8 w-8 text-primary" />
-            </div>
+    <AuthLayout
+      title="Sign in"
+      description="Use your staff account to reach the parking console."
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor="username">Username</Label>
+          <Input
+            id="username"
+            placeholder="admin"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            autoComplete="username"
+            required
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="password">Password</Label>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="pr-10"
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((previous) => !previous)}
+              className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-md text-muted-foreground transition-colors hover:text-foreground"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
           </div>
-          <CardTitle className="text-2xl font-bold">ParkEase</CardTitle>
-          <CardDescription>
-            Enter your credentials to access the parking management system
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                placeholder="admin"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex flex-col">
-          <div className="text-sm text-muted-foreground mb-4">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-primary hover:underline">
-              Register
-            </Link>
-          </div>
-          <p className="w-full text-center text-sm text-muted-foreground">
-            Demo credentials: admin / password123
-          </p>
-        </CardFooter>
-      </Card>
-    </div>
+        </div>
+
+        <Button type="submit" className="w-full">
+          Sign in
+        </Button>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-muted-foreground">
+        Don&apos;t have an account?{" "}
+        <Link
+          to="/register"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
+          Create one
+        </Link>
+      </p>
+
+      <div className="mt-8 rounded-lg border border-dashed bg-surface-sunken px-3.5 py-3">
+        <p className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Demo credentials
+        </p>
+        <p className="mt-1.5 font-mono text-xs text-foreground">
+          admin / password123
+          <span className="mx-2 text-border-strong">·</span>
+          attendant / password123
+        </p>
+      </div>
+    </AuthLayout>
   );
 };
 

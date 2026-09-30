@@ -2,14 +2,26 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { KeyRound, UserRound } from 'lucide-react';
+
 import { useToast } from '@/hooks/use-toast';
 import { useParking } from '@/context/parking';
+import AppLayout from '@/components/layout/AppLayout';
+import PageHeader from '@/components/layout/PageHeader';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import NavBar from '@/components/NavBar';
+import {
+  Panel,
+  PanelBody,
+  PanelDescription,
+  PanelFooter,
+  PanelHeader,
+  PanelHeading,
+  PanelIcon,
+  PanelTitle,
+} from '@/components/ui/panel';
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
@@ -30,12 +42,14 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
+const FieldError = ({ message }: { message?: string }) =>
+  message ? <p className="text-xs text-destructive">{message}</p> : null;
+
 export default function ProfileSettings() {
   const { user, updateProfile } = useParking();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const isSettingsPage = window.location.pathname === '/profile/settings';
-  
+
   const {
     register,
     handleSubmit,
@@ -53,40 +67,36 @@ export default function ProfileSettings() {
   const onSubmit = async (data: ProfileFormValues) => {
     try {
       setIsLoading(true);
-      
-      // Prepare the update data
+
       const updateData: any = {
         name: data.name,
         email: data.email,
         phone: data.phone,
       };
-      
-      // Only include password fields if new password is provided
+
+      // Only send password fields when a new password was actually entered.
       if (data.newPassword) {
         updateData.currentPassword = data.currentPassword;
         updateData.newPassword = data.newPassword;
       }
-      
-      // Call the update function from your auth context
+
       await updateProfile(updateData);
-      
+
       toast({
         title: 'Profile updated',
-        description: 'Your profile has been updated successfully.',
+        description: 'Your changes have been saved.',
       });
-      
-      // Reset form to clear password fields
+
       reset({
         ...data,
         currentPassword: '',
         newPassword: '',
         confirmPassword: '',
       });
-      
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Error',
+        title: 'Could not save changes',
         description: error.message || 'Failed to update profile',
       });
     } finally {
@@ -95,133 +105,123 @@ export default function ProfileSettings() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <NavBar />
-      <div className="container mx-auto px-4 py-8 flex-1">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {isSettingsPage ? 'Account Settings' : 'Profile'}
-            </h1>
-            <p className="text-muted-foreground">
-              {isSettingsPage 
-                ? 'Manage your account settings and password' 
-                : 'View and update your profile information'}
-            </p>
-          </div>
-        </div>
-      
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Update your account's profile information and email address.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  placeholder="John Doe"
-                  {...register('name')}
-                />
-                {errors.name && (
-                  <p className="text-sm text-red-500">{errors.name.message}</p>
-                )}
+    <AppLayout>
+      <PageHeader
+        eyebrow="Account"
+        title="Profile & settings"
+        description="Your details and sign-in credentials."
+        backTo="/dashboard"
+        actions={
+          <Badge variant={user.role === 'admin' ? 'subtle' : 'outline'}>
+            {user.role === 'admin' ? 'Administrator' : 'Attendant'}
+          </Badge>
+        }
+      />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 xl:grid-cols-2">
+        <Panel>
+          <PanelHeader>
+            <PanelHeading>
+              <PanelIcon>
+                <UserRound />
+              </PanelIcon>
+              <div>
+                <PanelTitle>Profile information</PanelTitle>
+                <PanelDescription>How you appear across the app</PanelDescription>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  {...register('email')}
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email.message}</p>
-                )}
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+254 7XX XXX XXX"
-                  {...register('phone')}
-                />
-                {errors.phone && (
-                  <p className="text-sm text-red-500">{errors.phone.message}</p>
-                )}
-              </div>
+            </PanelHeading>
+          </PanelHeader>
+
+          <PanelBody className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Full name</Label>
+              <Input id="name" placeholder="Jane Wanjiru" {...register('name')} />
+              <FieldError message={errors.name?.message} />
             </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Change Password</CardTitle>
-            <CardDescription>
-              Update your password. Leave blank to keep the current password.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="currentPassword">Current Password</Label>
-                <Input
-                  id="currentPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  {...register('currentPassword')}
-                />
-                {errors.currentPassword && (
-                  <p className="text-sm text-red-500">{errors.currentPassword.message}</p>
-                )}
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    {...register('newPassword')}
-                  />
-                  {errors.newPassword && (
-                    <p className="text-sm text-red-500">{errors.newPassword.message}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    {...register('confirmPassword')}
-                  />
-                  {errors.confirmPassword && (
-                    <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="pt-2">
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="jane@parkease.co.ke"
+                {...register('email')}
+              />
+              <FieldError message={errors.email?.message} />
             </div>
-          </CardContent>
-        </Card>
-        </form>
-      </div>
-    </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="phone">Phone number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+254 7XX XXX XXX"
+                {...register('phone')}
+              />
+              <FieldError message={errors.phone?.message} />
+            </div>
+          </PanelBody>
+        </Panel>
+
+        <Panel>
+          <PanelHeader>
+            <PanelHeading>
+              <PanelIcon className="bg-muted text-muted-foreground">
+                <KeyRound />
+              </PanelIcon>
+              <div>
+                <PanelTitle>Password</PanelTitle>
+                <PanelDescription>Leave blank to keep your current one</PanelDescription>
+              </div>
+            </PanelHeading>
+          </PanelHeader>
+
+          <PanelBody className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="currentPassword">Current password</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="current-password"
+                {...register('currentPassword')}
+              />
+              <FieldError message={errors.currentPassword?.message} />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="newPassword">New password</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                {...register('newPassword')}
+              />
+              <FieldError message={errors.newPassword?.message} />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="confirmPassword">Confirm new password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                autoComplete="new-password"
+                {...register('confirmPassword')}
+              />
+              <FieldError message={errors.confirmPassword?.message} />
+            </div>
+          </PanelBody>
+
+          <PanelFooter className="py-3.5">
+            <p>Changes apply to this account only.</p>
+            <Button type="submit" size="sm" disabled={isLoading}>
+              {isLoading ? 'Saving…' : 'Save changes'}
+            </Button>
+          </PanelFooter>
+        </Panel>
+      </form>
+    </AppLayout>
   );
 }

@@ -1,115 +1,134 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { LogIn, ParkingSquare, UserPlus } from "lucide-react";
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useParking } from "@/context/parking"
-import NavBar from "@/components/NavBar"
-import AdminDashboard from "@/components/AdminDashboard"
-import AttendantDashboard from "@/components/AttendantDashboard"
+import { useParking } from "@/context/parking";
+import AdminDashboard from "@/components/AdminDashboard";
+import AttendantDashboard from "@/components/AttendantDashboard";
+import ParkingStats from "@/components/ParkingStats";
+import ParkingLotGrid from "@/components/ParkingLotGrid";
+import AppLayout from "@/components/layout/AppLayout";
+import PageHeader from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Car, ParkingMeter, LogIn, UserPlus, ParkingSquare } from "lucide-react";
-import { motion } from "framer-motion";
-import { CarAnimation } from "@/components/ui/car-animation";
+import {
+  Panel,
+  PanelBody,
+  PanelDescription,
+  PanelHeader,
+  PanelHeading,
+  PanelIcon,
+  PanelTitle,
+} from "@/components/ui/panel";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const DashboardSkeleton = () => (
+  <div className="space-y-6">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <Skeleton key={index} className="h-[8.5rem] rounded-xl" />
+      ))}
+    </div>
+    <Skeleton className="h-9 w-72 rounded-md" />
+    <Skeleton className="h-80 rounded-xl" />
+  </div>
+);
+
+const GuestDashboard = () => (
+  <div className="space-y-6">
+    <ParkingStats />
+
+    <div className="grid gap-4 xl:grid-cols-3">
+      <Panel className="xl:col-span-2">
+        <PanelHeader>
+          <PanelHeading>
+            <PanelIcon>
+              <ParkingSquare />
+            </PanelIcon>
+            <div>
+              <PanelTitle>Live facility map</PanelTitle>
+              <PanelDescription>
+                Current occupancy across all bays
+              </PanelDescription>
+            </div>
+          </PanelHeading>
+        </PanelHeader>
+        <PanelBody>
+          <ParkingLotGrid />
+        </PanelBody>
+      </Panel>
+
+      <Panel>
+        <PanelHeader>
+          <PanelHeading>
+            <PanelTitle>Staff sign in</PanelTitle>
+          </PanelHeading>
+        </PanelHeader>
+        <PanelBody className="space-y-4">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Availability is public. Recording entries and exits, managing
+            reservations and viewing revenue need a staff account.
+          </p>
+          <div className="space-y-2">
+            <Button asChild className="w-full">
+              <Link to="/login">
+                <LogIn />
+                Sign in
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/register">
+                <UserPlus />
+                Create an account
+              </Link>
+            </Button>
+          </div>
+        </PanelBody>
+      </Panel>
+    </div>
+  </div>
+);
 
 const Dashboard = () => {
   const { user } = useParking();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
+    const timer = setTimeout(() => setIsLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
 
-  // Render different content based on authentication status
-  const renderContent = () => {
-    if (isLoading) {
-      return (
-        <div className="flex flex-col items-center justify-center py-12">
-          <CarAnimation size={48} duration={1.5} />
-          <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
-        </div>
-      );
-    }
+  const title = user.isLoggedIn
+    ? user.role === "admin"
+      ? "Facility overview"
+      : "Attendant console"
+    : "Parking availability";
 
-    // For authenticated users, show the appropriate dashboard
-    if (user.isLoggedIn) {
-      return user.role === "admin" ? <AdminDashboard /> : <AttendantDashboard />;
-    }
-
-    // For unauthenticated users, show the public dashboard
-    return (
-      <div className="max-w-3xl mx-auto py-12 text-center">
-        <div className="bg-primary/10 p-6 rounded-full inline-flex items-center justify-center mb-6">
-          <ParkingSquare className="h-12 w-12 text-primary" />
-        </div>
-        <h2 className="text-2xl font-bold text-foreground mb-4">Welcome to ParkEase</h2>
-        <p className="text-muted-foreground mb-8">
-          View parking availability and manage your parking experience. Sign in to access your account and manage your parking.
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
-          <Button 
-            onClick={() => navigate('/login')} 
-            className="w-full"
-          >
-            <LogIn className="mr-2 h-4 w-4" /> Sign In
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/register')} 
-            className="w-full"
-          >
-            <UserPlus className="mr-2 h-4 w-4" /> Create Account
-          </Button>
-        </div>
-      </div>
-    );
-  };
+  const description = user.isLoggedIn
+    ? user.role === "admin"
+      ? "Occupancy, revenue and access for the whole facility."
+      : "Record entries and exits, and keep an eye on active sessions."
+    : "Live occupancy for the facility. Sign in to record vehicle movements.";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <NavBar />
-      <main className="flex-1 container mx-auto px-4 py-6">
-        <motion.div 
-          className="mb-8"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <ParkingMeter className="h-8 w-8 text-primary" />
-              <div className="absolute -right-2 -bottom-2">
-                <CarAnimation size={16} />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                {user.isLoggedIn 
-                  ? (user.role === "admin" ? "Admin Dashboard" : "Attendant Dashboard")
-                  : "Parking Dashboard"}
-              </h1>
-              <p className="text-muted-foreground">
-                {user.isLoggedIn 
-                  ? "Manage your parking lot efficiently"
-                  : "View parking availability and manage your parking"}
-              </p>
-            </div>
-          </div>
-        </motion.div>
+    <AppLayout>
+      <PageHeader
+        eyebrow={user.isLoggedIn ? "Operations" : "Public view"}
+        title={title}
+        description={description}
+      />
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          {renderContent()}
-        </motion.div>
-      </main>
-    </div>
+      {isLoading ? (
+        <DashboardSkeleton />
+      ) : user.isLoggedIn ? (
+        user.role === "admin" ? (
+          <AdminDashboard />
+        ) : (
+          <AttendantDashboard />
+        )
+      ) : (
+        <GuestDashboard />
+      )}
+    </AppLayout>
   );
 };
 

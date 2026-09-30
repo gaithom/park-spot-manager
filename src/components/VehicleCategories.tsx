@@ -1,94 +1,127 @@
-
 import { useState } from "react";
-import { useParking } from "@/context/parking";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tags } from "lucide-react";
+import { toast } from "sonner";
+
+import { useParking } from "@/context/parking";
+import { formatMoney } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Panel,
+  PanelBody,
+  PanelDescription,
+  PanelHeader,
+  PanelHeading,
+  PanelIcon,
+  PanelTitle,
+} from "@/components/ui/panel";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const VehicleCategories = () => {
   const [categoryName, setCategoryName] = useState("");
   const [hourlyRate, setHourlyRate] = useState("");
   const { vehicleTypeCategories, addVehicleCategory } = useParking();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    addVehicleCategory({
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const created = addVehicleCategory({
       name: categoryName,
-      hourlyRate: Number(hourlyRate)
+      hourlyRate: Number(hourlyRate),
     });
-    
-    // Reset form if successful
+
+    if (!created) {
+      toast.error(`“${categoryName}” already exists`);
+      return;
+    }
+
+    toast.success(`${categoryName} added at KSh ${formatMoney(Number(hourlyRate))}/hr`);
     setCategoryName("");
     setHourlyRate("");
   };
 
   return (
-    <Card className="w-full bg-background border-neutral-700/20">
-      <CardHeader className="bg-secondary/30 border-b border-neutral-700/20">
-        <CardTitle className="flex items-center">
-          <Tags className="mr-2 h-5 w-5" /> Vehicle Categories
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="categoryName" className="text-foreground">Category Name</Label>
+    <Panel>
+      <PanelHeader>
+        <PanelHeading>
+          <PanelIcon>
+            <Tags />
+          </PanelIcon>
+          <div>
+            <PanelTitle>Vehicle categories</PanelTitle>
+            <PanelDescription>
+              Hourly rates applied when a bay is released
+            </PanelDescription>
+          </div>
+        </PanelHeading>
+      </PanelHeader>
+
+      <PanelBody className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="categoryName">Category name</Label>
               <Input
                 id="categoryName"
                 value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
-                placeholder="e.g., Pickup Truck"
-                className="bg-secondary border-neutral-700/20"
+                onChange={(event) => setCategoryName(event.target.value)}
+                placeholder="Pickup truck"
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="hourlyRate" className="text-foreground">Hourly Rate (ksh)</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="hourlyRate">Hourly rate (KSh)</Label>
               <Input
                 id="hourlyRate"
                 type="number"
                 min="1"
                 step="0.01"
                 value={hourlyRate}
-                onChange={(e) => setHourlyRate(e.target.value)}
-                placeholder="e.g., 15"
-                className="bg-secondary border-neutral-700/20"
+                onChange={(event) => setHourlyRate(event.target.value)}
+                placeholder="15"
                 required
               />
             </div>
           </div>
-          <Button type="submit" className="w-full">
-            Add Category
+          <Button type="submit" variant="outline" className="w-full sm:w-auto">
+            Add category
           </Button>
         </form>
 
-        <div className="rounded-md border border-neutral-700/20 overflow-hidden">
+        <div className="overflow-hidden rounded-lg border">
           <Table>
-            <TableHeader className="bg-secondary">
-              <TableRow className="border-b border-neutral-700/20">
+            <TableHeader>
+              <TableRow>
                 <TableHead>Category</TableHead>
-                <TableHead>Hourly Rate (ksh)</TableHead>
-                <TableHead>Current Count</TableHead>
+                <TableHead className="text-right">Rate / hr</TableHead>
+                <TableHead className="text-right">On site</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {vehicleTypeCategories.map((category) => (
                 <TableRow key={category.name}>
-                  <TableCell className="font-medium text-foreground">{category.name}</TableCell>
-                  <TableCell className="text-foreground">{category.hourlyRate.toFixed(2)}</TableCell>
-                  <TableCell className="text-foreground">{category.count}</TableCell>
+                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell className="text-right">
+                    KSh {formatMoney(category.hourlyRate)}
+                  </TableCell>
+                  <TableCell className="text-right text-muted-foreground">
+                    {category.count}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
-      </CardContent>
-    </Card>
+      </PanelBody>
+    </Panel>
   );
 };
 

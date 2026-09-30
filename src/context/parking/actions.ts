@@ -1,6 +1,5 @@
 import { ParkingSlot, Vehicle, ParkingHistory, VehicleTypeCategory, ParkingReservation, User, DailyRevenue } from "@/types";
 import { format } from "date-fns";
-import { generateVehicleTypeDistribution } from "./utils";
 import { USER_CREDENTIALS } from "./types";
 
 export const loginUser = (
@@ -398,28 +397,3 @@ export const addUser = (
   }
 };
 
-export const updateVehicleDistribution = (
-  slots: ParkingSlot[],
-  vehicleTypeCategories: VehicleTypeCategory[],
-  setVehicleTypeCategories: React.Dispatch<React.SetStateAction<VehicleTypeCategory[]>>,
-  setVehicleTypeDistribution: React.Dispatch<React.SetStateAction<import("@/types").VehicleTypeDistribution[]>>
-) => {
-  // Reset counts
-  const updatedCategories = vehicleTypeCategories.map(cat => ({ ...cat, count: 0 }));
-  
-  // Count vehicles by type
-  slots.forEach(slot => {
-    if (slot.isOccupied && slot.vehicle) {
-      const categoryIndex = updatedCategories.findIndex(
-        c => c.name.toLowerCase() === slot.vehicle?.vehicleType.toLowerCase()
-      );
-      
-      if (categoryIndex !== -1) {
-        updatedCategories[categoryIndex].count += 1;
-      }
-    }
-  });
-  
-  setVehicleTypeCategories(updatedCategories);
-  setVehicleTypeDistribution(generateVehicleTypeDistribution(updatedCategories));
-};

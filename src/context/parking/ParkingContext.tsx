@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect, useMemo } from "react";
 import {
   ParkingSlot, Vehicle, User, ParkingHistory, 
   VehicleTypeCategory, ParkingReservation, 
@@ -13,7 +13,7 @@ import {
 import { 
   loginUser, logoutUser, parkVehicle, removeVehicle, 
   addVehicleCategory, makeReservation, cancelReservation, 
-  getVehicleHistory, addUser, updateVehicleDistribution, updateProfile 
+  getVehicleHistory, addUser, updateProfile
 } from "./actions";
 import { generateDailyRevenue, generateVehicleTypeDistribution } from "./utils";
 
@@ -42,8 +42,35 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
   const availableSlots = slots.filter(slot => !slot.isOccupied && !slot.isReserved).length;
 
   const [dailyRevenue, setDailyRevenue] = useState<DailyRevenue[]>(generateDailyRevenue());
-  const [vehicleTypeDistribution, setVehicleTypeDistribution] = useState<VehicleTypeDistribution[]>(
-    generateVehicleTypeDistribution(vehicleTypeCategories)
+
+  /*
+    Per-category vehicle counts are derived from `slots` rather than stored.
+
+    They used to be written back into `vehicleTypeCategories` by an effect that
+    also listed `vehicleTypeCategories` as a dependency, and the writer always
+    produced a fresh array — so each run re-triggered the effect and the
+    provider re-rendered forever ("Maximum update depth exceeded"), rewriting
+    localStorage on every pass. Deriving removes the cycle by construction:
+    the stored categories now only change when someone adds one.
+  */
+  const categoriesWithCounts = useMemo<VehicleTypeCategory[]>(() => {
+    const counts = new Map<string, number>();
+
+    slots.forEach(slot => {
+      if (!slot.isOccupied || !slot.vehicle) return;
+      const key = slot.vehicle.vehicleType.toLowerCase();
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    });
+
+    return vehicleTypeCategories.map(category => ({
+      ...category,
+      count: counts.get(category.name.toLowerCase()) ?? 0
+    }));
+  }, [slots, vehicleTypeCategories]);
+
+  const vehicleTypeDistribution = useMemo<VehicleTypeDistribution[]>(
+    () => generateVehicleTypeDistribution(categoriesWithCounts),
+    [categoriesWithCounts]
   );
 
   // Save data to localStorage when they change
@@ -76,16 +103,6 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
       document.documentElement.classList.remove("dark");
     }
   }, [theme]);
-
-  // Update vehicle distribution whenever slots or vehicleTypeCategories change
-  useEffect(() => {
-    updateVehicleDistribution(
-      slots, 
-      vehicleTypeCategories, 
-      setVehicleTypeCategories, 
-      setVehicleTypeDistribution
-    );
-  }, [slots, vehicleTypeCategories]);
 
   // Toggle theme function
   const toggleTheme = () => {
@@ -154,7 +171,8 @@ export const ParkingProvider = ({ children }: { children: ReactNode }) => {
       availableSlots, 
       totalSlots: TOTAL_SLOTS,
       parkingHistory,
-      vehicleTypeCategories,
+      // Consumers get the counted view; the raw state stays the user-edited list.
+      vehicleTypeCategories: categoriesWithCounts,
       reservations,
       dailyRevenue,
       vehicleTypeDistribution,

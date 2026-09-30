@@ -1,8 +1,18 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { AlertCircle, CreditCard } from 'lucide-react';
+
+import { useParking } from '@/context/parking';
+import { formatMoney } from '@/lib/utils';
 import { createPaymentIntent } from '@/services/paymentService';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export const PaymentModal = ({
   isOpen,
@@ -23,12 +33,13 @@ export const PaymentModal = ({
 }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { theme } = useParking();
   const stripe = useStripe();
   const elements = useElements();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!stripe || !elements) {
       return;
     }
@@ -39,7 +50,7 @@ export const PaymentModal = ({
     try {
       // Create payment intent on the server
       const { clientSecret } = await createPaymentIntent(amount);
-      
+
       const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement)!,
@@ -63,77 +74,98 @@ export const PaymentModal = ({
     }
   };
 
+  /*
+    Stripe renders the card field in a cross-origin iframe, so it cannot read
+    our CSS variables — the palette has to be passed as literal colours and
+    switched with the app theme by hand.
+  */
+  const isDark = theme === 'dark';
   const cardElementOptions = {
     style: {
       base: {
-        fontSize: '16px',
-        color: '#424770',
+        fontSize: '14px',
+        fontFamily:
+          'Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+        color: isDark ? '#e9f1ee' : '#132420',
         '::placeholder': {
-          color: '#aab7c4',
+          color: isDark ? '#8fa39d' : '#67756f',
         },
+        iconColor: isDark ? '#4bc08c' : '#156b4a',
       },
       invalid: {
-        color: '#9e2146',
+        color: isDark ? '#ec6a6f' : '#c0303a',
+        iconColor: isDark ? '#ec6a6f' : '#c0303a',
       },
     },
   };
 
+  const summary = [
+    { label: 'Vehicle type', value: vehicleType || '—' },
+    { label: 'Duration', value: duration || '—' },
+  ];
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[26rem]">
         <DialogHeader>
-          <DialogTitle>Complete Payment</DialogTitle>
+          <span className="mb-1 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-subtle text-primary">
+            <CreditCard className="h-5 w-5" />
+          </span>
+          <DialogTitle>Complete payment</DialogTitle>
           <DialogDescription>
-            Pay for your parking reservation
+            Card details are handled by Stripe and never touch this server.
           </DialogDescription>
         </DialogHeader>
-        
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Vehicle Type:</span>
-              <span className="font-medium">{vehicleType}</span>
+
+        <div className="rounded-lg border bg-surface-sunken p-4">
+          <dl className="space-y-2">
+            {summary.map((row) => (
+              <div key={row.label} className="flex items-center justify-between">
+                <dt className="text-sm text-muted-foreground">{row.label}</dt>
+                <dd className="text-sm font-medium text-foreground">{row.value}</dd>
+              </div>
+            ))}
+            <div className="flex items-baseline justify-between border-t pt-2.5">
+              <dt className="text-sm font-medium text-foreground">Total</dt>
+              <dd
+                data-numeric
+                className="text-lg font-semibold tracking-tight text-foreground"
+              >
+                KSh {formatMoney(amount)}
+              </dd>
             </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Duration:</span>
-              <span className="font-medium">{duration}</span>
-            </div>
-            <div className="flex justify-between pt-2 border-t">
-              <span className="text-sm font-medium">Total Amount:</span>
-              <span className="font-bold">KSh {amount.toLocaleString()}</span>
-            </div>
+          </dl>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="rounded-md border border-input bg-surface px-3 py-3 shadow-xs transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/20">
+            <CardElement options={cardElementOptions} />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="border rounded-md p-4">
-              <CardElement options={cardElementOptions} />
+          {error && (
+            <div
+              role="alert"
+              className="flex items-start gap-2 rounded-md border border-danger/30 bg-danger-subtle px-3 py-2 text-sm text-danger"
+            >
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{error}</span>
             </div>
-            
-            {error && (
-              <div className="text-red-500 text-sm">
-                {error}
-              </div>
-            )}
+          )}
 
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={isProcessing}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={!stripe || isProcessing}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {isProcessing ? 'Processing...' : `Pay KSh ${amount.toLocaleString()}`}
-              </Button>
-            </div>
-          </form>
-        </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isProcessing}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!stripe || isProcessing}>
+              {isProcessing ? 'Processing…' : `Pay KSh ${formatMoney(amount)}`}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

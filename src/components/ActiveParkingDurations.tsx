@@ -1,75 +1,103 @@
+import { useMemo } from "react";
+import { Timer } from "lucide-react";
 
 import { useParking } from "@/context/parking";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Timer } from "lucide-react";
-import { formatDateTime } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useNow } from "@/hooks/use-now";
+import { formatDuration, formatShortDateTime } from "@/lib/utils";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  Panel,
+  PanelDescription,
+  PanelHeader,
+  PanelHeading,
+  PanelIcon,
+  PanelTitle,
+} from "@/components/ui/panel";
+import { Plate } from "@/components/ui/plate";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const ActiveParkingDurations = () => {
   const { slots } = useParking();
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const now = useNow();
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const calculateDuration = (entryTime: string | Date | null): string => {
-    if (!entryTime) return "N/A";
-    
-    const start = entryTime instanceof Date ? entryTime : new Date(entryTime);
-    const diff = currentTime.getTime() - start.getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
-  };
-
-  const occupiedSlots = slots.filter(slot => slot.isOccupied);
+  // Longest stays first — those are the ones an attendant needs to look at.
+  const active = useMemo(
+    () =>
+      slots
+        .filter((slot) => slot.isOccupied && slot.vehicle?.entryTime)
+        .sort(
+          (a, b) =>
+            new Date(a.vehicle!.entryTime as Date).getTime() -
+            new Date(b.vehicle!.entryTime as Date).getTime()
+        ),
+    [slots]
+  );
 
   return (
-    <Card className="w-full">
-      <CardHeader className="bg-blue-500/5">
-        <CardTitle className="flex items-center text-blue-600">
-          <Timer className="mr-2 h-5 w-5" /> Active Parking Durations
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Slot</TableHead>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>Entry Time</TableHead>
-                <TableHead>Duration</TableHead>
+    <Panel>
+      <PanelHeader>
+        <PanelHeading>
+          <PanelIcon>
+            <Timer />
+          </PanelIcon>
+          <div>
+            <PanelTitle>Active sessions</PanelTitle>
+            <PanelDescription>
+              {active.length} {active.length === 1 ? "vehicle" : "vehicles"} on
+              site, longest stay first
+            </PanelDescription>
+          </div>
+        </PanelHeading>
+      </PanelHeader>
+
+      {active.length === 0 ? (
+        <EmptyState
+          icon={Timer}
+          title="No vehicles on site"
+          description="Active parking sessions appear here as soon as an entry is recorded."
+        />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-16">Bay</TableHead>
+              <TableHead>Registration</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Entry</TableHead>
+              <TableHead className="text-right">Elapsed</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {active.map((slot) => (
+              <TableRow key={slot.slotNumber}>
+                <TableCell className="font-mono text-xs font-semibold text-muted-foreground">
+                  {String(slot.slotNumber).padStart(2, "0")}
+                </TableCell>
+                <TableCell>
+                  <Plate value={slot.vehicle?.regNumber} />
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {slot.vehicle?.vehicleType || "—"}
+                </TableCell>
+                <TableCell className="whitespace-nowrap text-muted-foreground">
+                  {formatShortDateTime(slot.vehicle!.entryTime as Date)}
+                </TableCell>
+                <TableCell className="text-right font-semibold">
+                  {formatDuration(slot.vehicle?.entryTime, now)}
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {occupiedSlots.length > 0 ? (
-                occupiedSlots.map((slot) => (
-                  <TableRow key={slot.slotNumber}>
-                    <TableCell>{slot.slotNumber}</TableCell>
-                    <TableCell>{slot.vehicle?.regNumber}</TableCell>
-                    <TableCell>{formatDateTime(slot.vehicle?.entryTime || '')}</TableCell>
-                    <TableCell>{calculateDuration(slot.vehicle?.entryTime)}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
-                    No active parking sessions
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </Panel>
   );
 };
 

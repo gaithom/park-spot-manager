@@ -9,11 +9,8 @@ const Index = () => {
 
   useEffect(() => {
     // Redirect to home page for public users, dashboard if logged in
-    if (user.isLoggedIn) {
-      navigate("/dashboard");
-    } else {
-      navigate("/home");
-    }
+    // The public landing page lives at "/", not "/home" — that route 404s.
+    navigate(user.isLoggedIn ? "/dashboard" : "/");
   }, [user.isLoggedIn, navigate]);
 
   return null; // This component just redirects

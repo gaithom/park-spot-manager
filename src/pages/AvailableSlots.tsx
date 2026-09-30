@@ -1,285 +1,266 @@
-
-import { useState, useEffect } from "react";
-import { useParking } from "@/context/parking";
-import NavBar from "@/components/NavBar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { LayoutGrid, List, CheckCircle, ArrowLeft, ParkingMeter, RefreshCw, Info, Clock, Car, Calendar, MapPin, X } from "lucide-react";
-import { motion } from "framer-motion";
-import ParkingLotGrid from "@/components/ParkingLotGrid";
+import {
+  CheckCircle2,
+  Car,
+  Clock,
+  LayoutGrid,
+  List,
+  MapPin,
+  ParkingSquare,
+  RefreshCw,
+} from "lucide-react";
+
+import { useParking } from "@/context/parking";
+import { useCapacity } from "@/hooks/use-capacity";
+import type { ParkingSlot } from "@/types";
+import AppLayout from "@/components/layout/AppLayout";
+import PageHeader from "@/components/layout/PageHeader";
+import { BayLegend } from "@/components/parking/ParkingBay";
+import ParkingLotMap from "@/components/parking/ParkingLotMap";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { EmptyState } from "@/components/ui/empty-state";
+import {
+  Panel,
+  PanelActions,
+  PanelBody,
+  PanelDescription,
+  PanelHeader,
+  PanelHeading,
+  PanelIcon,
+  PanelTitle,
+} from "@/components/ui/panel";
+import { Skeleton } from "@/components/ui/skeleton";
+import { StatTile } from "@/components/ui/stat-tile";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AvailableSlots = () => {
   const { slots } = useParking();
-  const [isLoadingState, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedSlot, setSelectedSlot] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const availableSlots = slots.filter(slot => !slot.isOccupied);
+  const capacity = useCapacity();
+  const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"map" | "list">("map");
+  const [selectedSlot, setSelectedSlot] = useState<ParkingSlot | null>(null);
 
-  const handleSlotClick = (slot) => {
-    setSelectedSlot(slot);
-    setIsDialogOpen(true);
-  };
+  const availableSlots = slots.filter(
+    (slot) => !slot.isOccupied && !slot.isReserved
+  );
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
+    const timer = setTimeout(() => setIsLoading(false), 600);
     return () => clearTimeout(timer);
   }, []);
 
-  const refreshData = () => {
+  const refresh = () => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
+    setTimeout(() => setIsLoading(false), 450);
   };
 
+  const details = selectedSlot
+    ? [
+        { label: "Status", value: "Available", icon: CheckCircle2 },
+        { label: "Type", value: selectedSlot.type || "Standard", icon: Car },
+        { label: "Floor", value: selectedSlot.floor || "Ground", icon: MapPin },
+      ]
+    : [];
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <NavBar />
-      <main className="flex-1 container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center">
-              <Link to="/dashboard" className="mr-4">
-                <Button variant="outline" size="icon" className="border-border hover:bg-muted">
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-              </Link>
-              <div className="flex items-center gap-3">
-                <ParkingMeter className="h-8 w-8 text-primary" />
-                <div>
-                  <h1 className="text-2xl font-bold tracking-tight text-foreground">Available Parking Slots</h1>
-                  <p className="text-muted-foreground">
-                    {isLoadingState ? 'Checking parking spaces...' : `${availableSlots.length} slots available`}
-                  </p>
-                </div>
-              </div>
+    <AppLayout>
+      <PageHeader
+        eyebrow="Operations"
+        title="Parking map"
+        description="Live status of every bay in the facility."
+        backTo="/dashboard"
+        actions={
+          <Button variant="outline" size="sm" onClick={refresh} disabled={isLoading}>
+            <RefreshCw className={isLoading ? "animate-spin" : undefined} />
+            Refresh
+          </Button>
+        }
+      />
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatTile
+          label="Available"
+          value={capacity.available}
+          icon={CheckCircle2}
+          tone="success"
+          hint="Ready to fill now"
+        />
+        <StatTile
+          label="Occupied"
+          value={capacity.occupied}
+          icon={Car}
+          tone="primary"
+          hint={`${capacity.occupancyRate}% of capacity`}
+        />
+        <StatTile
+          label="Reserved"
+          value={capacity.reserved}
+          icon={Clock}
+          tone="brass"
+          hint="Held for arriving customers"
+        />
+      </div>
+
+      <Panel>
+        <PanelHeader>
+          <PanelHeading>
+            <PanelIcon>
+              <ParkingSquare />
+            </PanelIcon>
+            <div>
+              <PanelTitle>Facility layout</PanelTitle>
+              <PanelDescription>
+                {availableSlots.length} of {slots.length} bays free
+              </PanelDescription>
             </div>
-            
-            <Tabs 
-              value={viewMode} 
-              onValueChange={(value) => setViewMode(value as 'grid' | 'list')}
-              className="w-full sm:w-auto"
+          </PanelHeading>
+
+          <PanelActions>
+            <Tabs
+              value={viewMode}
+              onValueChange={(value) => setViewMode(value as "map" | "list")}
             >
-              <TabsList className="bg-background">
-                <TabsTrigger value="grid" className="flex items-center gap-2">
-                  <LayoutGrid className="h-4 w-4" /> Grid
+              <TabsList variant="segmented">
+                <TabsTrigger value="map">
+                  <LayoutGrid />
+                  Map
                 </TabsTrigger>
-                <TabsTrigger value="list" className="flex items-center gap-2">
-                  <List className="h-4 w-4" /> List
+                <TabsTrigger value="list">
+                  <List />
+                  List
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-          </div>
-        </div>
+          </PanelActions>
+        </PanelHeader>
 
-        <Card className="shadow-sm border-border">
-          <CardHeader className="bg-secondary/10 border-b border-border p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <CardTitle className="text-xl text-foreground">
-                  Available Slots: {availableSlots.length}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Click on a slot to view details
-                </p>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={refreshData}
-                disabled={isLoadingState}
-                className="flex items-center gap-2"
-              >
-                <RefreshCw className={`h-4 w-4 ${isLoadingState ? 'animate-spin' : ''}`} />
-                Refresh
+        {isLoading ? (
+          <PanelBody className="space-y-2">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <Skeleton key={index} className="h-14 rounded-md" />
+            ))}
+          </PanelBody>
+        ) : availableSlots.length === 0 && viewMode === "list" ? (
+          <EmptyState
+            icon={ParkingSquare}
+            title="No available bays"
+            description="Every bay is currently occupied or reserved."
+            action={
+              <Button asChild variant="outline" size="sm">
+                <Link to="/dashboard">Back to dashboard</Link>
               </Button>
-            </div>
-          </CardHeader>
-          
-          <CardContent className="p-0">
-            {isLoadingState ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-              </div>
-            ) : availableSlots.length === 0 ? (
-              <Card className="py-12 text-center m-4">
-                <div className="flex flex-col items-center justify-center space-y-4">
-                  <ParkingMeter className="h-12 w-12 text-muted-foreground" />
-                  <h3 className="text-lg font-medium">No available parking slots</h3>
-                  <p className="text-muted-foreground">All parking slots are currently occupied</p>
-                  <Button asChild className="mt-4">
-                    <Link to="/dashboard">Back to Dashboard</Link>
-                  </Button>
-                </div>
-              </Card>
-            ) : viewMode === 'grid' ? (
-              <div className="space-y-6 p-6">
-                <ParkingLotGrid />
-                <div className="text-sm text-muted-foreground text-center">
-                  Showing {availableSlots.length} available {availableSlots.length === 1 ? 'slot' : 'slots'}
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6 p-6">
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Slot Number</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Floor</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {availableSlots.map((slot) => (
-                        <TableRow 
-                          key={slot.slotNumber} 
-                          onClick={() => handleSlotClick(slot)}
-                          className="cursor-pointer hover:bg-muted/50 transition-colors"
-                        >
-                          <TableCell className="font-medium">{slot.slotNumber}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                              <span>Available</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>{slot.type || 'Standard'}</TableCell>
-                          <TableCell>{slot.floor || 'Ground'}</TableCell>
-                          <TableCell className="text-right">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              asChild
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Link to={`/park-vehicle?slot=${slot.slotNumber}`}>
-                                Park Vehicle
-                              </Link>
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                <div className="text-sm text-muted-foreground text-center">
-                  Showing {availableSlots.length} available {availableSlots.length === 1 ? 'slot' : 'slots'}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </main>
+            }
+          />
+        ) : viewMode === "map" ? (
+          <PanelBody className="space-y-4">
+            <BayLegend />
+            <ParkingLotMap
+              slots={slots}
+              size="md"
+              perRow={8}
+              selectedSlot={selectedSlot?.slotNumber ?? null}
+              onSlotSelect={setSelectedSlot}
+            />
+            <p className="text-xs text-muted-foreground">
+              Select a free bay to see its details.
+            </p>
+          </PanelBody>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-20">Bay</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Floor</TableHead>
+                <TableHead className="text-right">Details</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {availableSlots.map((slot) => (
+                <TableRow key={slot.slotNumber}>
+                  <TableCell className="font-mono text-xs font-semibold text-muted-foreground">
+                    {String(slot.slotNumber).padStart(2, "0")}
+                  </TableCell>
+                  <TableCell>{slot.type || "Standard"}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {slot.floor || "Ground"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => setSelectedSlot(slot)}
+                    >
+                      View
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </Panel>
 
-      {/* Slot Details Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog
+        open={Boolean(selectedSlot)}
+        onOpenChange={(open) => !open && setSelectedSlot(null)}
+      >
+        <DialogContent className="sm:max-w-[25rem]">
           <DialogHeader>
-            <div className="flex justify-between items-center">
-              <div>
-                <DialogTitle className="flex items-center gap-2">
-                  <ParkingMeter className="h-5 w-5 text-primary" />
-                  Parking Slot Details
-                </DialogTitle>
-                <DialogDescription>
-                  Detailed information about the selected parking slot
-                </DialogDescription>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setIsDialogOpen(false)}
-                className="h-8 w-8"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <DialogTitle>
+              Bay {selectedSlot ? String(selectedSlot.slotNumber).padStart(2, "0") : ""}
+            </DialogTitle>
+            <DialogDescription>
+              Entries are recorded from the attendant console.
+            </DialogDescription>
           </DialogHeader>
-          
-          {selectedSlot && (
-            <div className="space-y-4 py-2">
-              <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                <div className="p-2 bg-primary/10 rounded-full">
-                  <ParkingMeter className="h-6 w-6 text-primary" />
-                </div>
+
+          <dl className="grid gap-2">
+            {details.map((detail) => (
+              <div
+                key={detail.label}
+                className="flex items-center gap-3 rounded-lg border bg-surface-sunken px-3 py-2.5"
+              >
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-card text-muted-foreground">
+                  <detail.icon className="h-4 w-4" />
+                </span>
                 <div>
-                  <p className="text-sm text-muted-foreground">Slot Number</p>
-                  <p className="text-lg font-semibold">#{selectedSlot.slotNumber}</p>
+                  <dt className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {detail.label}
+                  </dt>
+                  <dd className="text-sm font-medium text-foreground">
+                    {detail.value}
+                  </dd>
                 </div>
               </div>
+            ))}
+          </dl>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="flex items-start gap-3 p-3 rounded-lg border">
-                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Status</p>
-                    <p className="font-medium">Available</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 rounded-lg border">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                    <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Type</p>
-                    <p className="font-medium">{selectedSlot.type || 'Standard'}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 rounded-lg border">
-                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                    <MapPin className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Floor</p>
-                    <p className="font-medium">{selectedSlot.floor || 'Ground'}</p>
-                  </div>
-                </div>
-
-                {selectedSlot.reservedFor && (
-                  <div className="flex items-start gap-3 p-3 rounded-lg border">
-                    <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-full">
-                      <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Reserved For</p>
-                      <p className="font-medium">{selectedSlot.reservedFor}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <Button 
-                  asChild 
-                  className="flex-1"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Link to={`/park-vehicle?slot=${selectedSlot.slotNumber}`}>
-                    <Car className="mr-2 h-4 w-4" />
-                    Park Vehicle
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          )}
+          <Button asChild className="w-full">
+            <Link to="/dashboard">
+              <Car />
+              Open attendant console
+            </Link>
+          </Button>
         </DialogContent>
       </Dialog>
-    </div>
+    </AppLayout>
   );
 };
 
