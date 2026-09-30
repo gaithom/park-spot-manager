@@ -45,7 +45,8 @@ const PageHeader = ({
 
       <div className="min-w-0">
         {eyebrow ? (
-          <p className="mb-1.5 text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <p className="mb-2 flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            <span aria-hidden="true" className="h-px w-5 bg-brass" />
             {eyebrow}
           </p>
         ) : null}

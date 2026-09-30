@@ -97,6 +97,14 @@
 
     --radius: 0.625rem;
     --shadow-tint: 166 32% 12%;
+
+    /*
+      The crisp top edge that makes a panel read as a physical surface rather
+      than a coloured rectangle. Lives in a variable because a Tailwind shadow
+      value cannot branch on the dark class.
+    */
+    --edge-highlight: 0 0% 100% / 0.75;
+    --primary-light: 158 60% 30%;
   }
 
   .dark {
@@ -167,6 +175,8 @@
     --sidebar-active: 168 14% 12%;
 
     --shadow-tint: 168 60% 2%;
+    --edge-highlight: 0 0% 100% / 0.055;
+    --primary-light: 156 50% 52%;
   }
 }
 
@@ -273,6 +283,35 @@
       transparent 1px
     );
     background-size: 22px 22px;
+  }
+
+  /*
+    Painted-marking motif. Borrowed from the floor of an actual facility and
+    used deliberately — an edge, a corner, an empty bay — never as wallpaper.
+  */
+  .stripes-hazard {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      hsl(var(--brass) / 0.18) 0 7px,
+      transparent 7px 18px
+    );
+  }
+
+  .stripes-hazard-light {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      hsl(0 0% 100% / 0.14) 0 7px,
+      transparent 7px 18px
+    );
+  }
+
+  /* Fine diagonal tooth, for sunken surfaces that would otherwise read as dead space. */
+  .texture-hatch {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      hsl(var(--foreground) / 0.028) 0 1px,
+      transparent 1px 6px
+    );
   }
 
   /* Fades the bottom of a scrolling region instead of cutting rows off hard. */

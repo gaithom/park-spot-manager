@@ -135,6 +135,15 @@ export default {
 				'2xl': 'calc(var(--radius) + 10px)',
 			},
 			boxShadow: {
+				/* Layered elevation: a lit top edge plus a soft contact shadow. */
+				panel:
+					'inset 0 1px 0 0 hsl(var(--edge-highlight)), 0 1px 2px -1px hsl(var(--shadow-tint) / 0.10), 0 3px 10px -4px hsl(var(--shadow-tint) / 0.07)',
+				raised:
+					'inset 0 1px 0 0 hsl(var(--edge-highlight)), 0 2px 4px -2px hsl(var(--shadow-tint) / 0.10), 0 10px 24px -8px hsl(var(--shadow-tint) / 0.14)',
+				control:
+					'inset 0 1px 0 0 hsl(var(--edge-highlight)), 0 1px 2px 0 hsl(var(--shadow-tint) / 0.07)',
+				solid:
+					'inset 0 1px 0 0 hsl(0 0% 100% / 0.16), 0 1px 2px 0 hsl(var(--shadow-tint) / 0.24)',
 				xs: '0 1px 2px 0 hsl(var(--shadow-tint) / 0.05)',
 				sm: '0 1px 2px -1px hsl(var(--shadow-tint) / 0.09), 0 1px 1px -1px hsl(var(--shadow-tint) / 0.05)',
 				DEFAULT: '0 1px 3px 0 hsl(var(--shadow-tint) / 0.08), 0 1px 2px -1px hsl(var(--shadow-tint) / 0.06)',

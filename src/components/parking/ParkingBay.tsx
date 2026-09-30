@@ -1,4 +1,4 @@
-import { Car, Clock } from "lucide-react"
+import { Clock } from "lucide-react"
 
 import type { ParkingSlot } from "@/types"
 import { cn } from "@/lib/utils"
@@ -13,20 +13,31 @@ export const bayStatus = (slot: ParkingSlot): BayStatus => {
 }
 
 /*
-  A single stall. The border is the painted line, so the three states read
-  differently even at 14px tall and even in greyscale:
+  A vehicle seen from above, because the map is seen from above. A side-view car
+  icon in a top-down floor plan is the detail that gives the whole thing away.
+*/
+const CarTopDown = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 18 30" className={className} aria-hidden="true">
+    <rect x="1" y="0.5" width="16" height="29" rx="5.5" fill="currentColor" />
+    {/* Glass, punched back out of the body in the surface colour. */}
+    <rect x="3.6" y="3.8" width="10.8" height="5.8" rx="2.4" fill="hsl(var(--card))" opacity="0.5" />
+    <rect x="3.1" y="11.2" width="11.8" height="7" rx="2" fill="hsl(var(--card))" opacity="0.13" />
+    <rect x="3.6" y="19.8" width="10.8" height="6.2" rx="2.4" fill="hsl(var(--card))" opacity="0.32" />
+  </svg>
+)
 
-    available — thin green line, empty inside
-    occupied  — no line, filled with ink, carries the plate
-    reserved  — dashed brass line
+/*
+  Stall paint does the talking. Side lines are 2px like real bay markings, the
+  head and foot are hairlines, and corners stay nearly square — rounded corners
+  read as a button, not as paint on asphalt.
 */
 const statusStyles: Record<BayStatus, string> = {
   available:
-    "border-success/40 bg-success-subtle/50 text-success dark:bg-success-subtle/40",
+    "border-x-2 border-y border-x-success/45 border-y-success/20 bg-success-subtle/45 text-success",
   occupied:
-    "border-transparent bg-foreground/[0.08] text-foreground dark:bg-foreground/[0.12]",
+    "border-x-2 border-y border-x-border-strong/70 border-y-border bg-foreground/[0.05] text-foreground dark:bg-foreground/[0.09]",
   reserved:
-    "border-dashed border-brass/60 bg-brass-subtle/50 text-brass-foreground dark:text-brass",
+    "border-2 border-dashed border-brass/60 bg-brass-subtle/45 text-brass-foreground dark:text-brass",
 }
 
 interface ParkingBayProps {
@@ -61,71 +72,76 @@ const ParkingBay = ({ slot, size = "md", selected, onSelect }: ParkingBayProps) 
       aria-label={label}
       aria-pressed={interactive ? Boolean(selected) : undefined}
       className={cn(
-        "relative flex w-full flex-col items-center justify-center gap-1 rounded-md border text-center transition-all duration-150",
+        // Near-square corners: paint on asphalt, not a rounded chip.
+        "group relative flex w-full flex-col items-center justify-center gap-1 rounded-[3px] text-center transition-all duration-150",
         size === "sm" ? "h-14" : "h-[5.25rem] px-1.5",
         statusStyles[status],
         interactive &&
-          "cursor-pointer hover:border-primary hover:bg-primary-subtle hover:text-primary",
+          "cursor-pointer hover:border-x-primary hover:bg-primary-subtle hover:text-primary",
         selected &&
-          "border-primary bg-primary-subtle text-primary ring-2 ring-primary ring-offset-2 ring-offset-card"
+          "border-x-primary bg-primary-subtle text-primary ring-2 ring-primary ring-offset-2 ring-offset-card"
       )}
     >
-      <span
-        className={cn(
-          "font-mono font-semibold tabular-nums",
-          size === "sm"
-            ? "text-2xs"
-            : "absolute left-2 top-1.5 text-2xs text-muted-foreground"
-        )}
-      >
+      {/* Stencilled stall number, always in the same corner. */}
+      <span className="pointer-events-none absolute left-1 top-0.5 font-mono text-2xs font-semibold tabular-nums opacity-55">
         {String(slot.slotNumber).padStart(2, "0")}
       </span>
 
-      {size === "sm" ? (
-        status === "occupied" ? (
-          <Car className="h-3.5 w-3.5 opacity-70" />
-        ) : status === "reserved" ? (
-          <Clock className="h-3 w-3 opacity-80" />
-        ) : (
-          <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />
-        )
-      ) : status === "occupied" ? (
+      {status === "occupied" ? (
         <>
-          <Car className="h-4 w-4 opacity-70" />
-          <Plate value={slot.vehicle?.regNumber} size="sm" />
+          <CarTopDown
+            className={cn(
+              "text-foreground/45 dark:text-foreground/35",
+              size === "sm" ? "h-8" : "h-9"
+            )}
+          />
+          {size === "md" ? (
+            <Plate value={slot.vehicle?.regNumber} size="sm" />
+          ) : null}
         </>
       ) : status === "reserved" ? (
         <>
-          <Clock className="h-4 w-4 opacity-80" />
-          <span className="text-2xs font-medium">Reserved</span>
+          <Clock className={size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4"} />
+          {size === "md" ? (
+            <span className="text-2xs font-medium">Reserved</span>
+          ) : null}
         </>
-      ) : (
-        <>
-          <span className="h-2 w-2 rounded-full bg-current opacity-50" />
-          <span className="text-2xs font-medium">
-            {interactive ? "Select" : "Free"}
-          </span>
-        </>
-      )}
+      ) : interactive ? (
+        <span className="text-2xs font-medium opacity-0 transition-opacity group-hover:opacity-100">
+          Select
+        </span>
+      ) : null}
     </Element>
   )
 }
 
 const legend: { status: BayStatus; label: string; swatch: string }[] = [
-  { status: "available", label: "Available", swatch: "border-success/50 bg-success-subtle" },
-  { status: "occupied", label: "Occupied", swatch: "border-transparent bg-foreground/20" },
-  { status: "reserved", label: "Reserved", swatch: "border-dashed border-brass/70 bg-brass-subtle" },
+  {
+    status: "available",
+    label: "Available",
+    swatch: "border-x-2 border-y border-x-success/60 border-y-success/25 bg-success-subtle",
+  },
+  {
+    status: "occupied",
+    label: "Occupied",
+    swatch: "border-x-2 border-y border-x-border-strong bg-foreground/10",
+  },
+  {
+    status: "reserved",
+    label: "Reserved",
+    swatch: "border-2 border-dashed border-brass/70 bg-brass-subtle",
+  },
 ]
 
 const BayLegend = ({ className }: { className?: string }) => (
   <div className={cn("flex flex-wrap items-center gap-x-4 gap-y-1.5", className)}>
     {legend.map((item) => (
       <span key={item.status} className="flex items-center gap-1.5">
-        <span className={cn("h-3 w-3 rounded-sm border", item.swatch)} />
+        <span className={cn("h-3.5 w-3 rounded-[2px]", item.swatch)} />
         <span className="text-xs text-muted-foreground">{item.label}</span>
       </span>
     ))}
   </div>
 )
 
-export { ParkingBay, BayLegend }
+export { ParkingBay, BayLegend, CarTopDown }

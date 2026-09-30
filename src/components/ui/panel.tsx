@@ -15,7 +15,7 @@ const Panel = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-xs",
+      "flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-panel",
       className
     )}
     {...props}
@@ -30,7 +30,7 @@ const PanelHeader = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b px-5 py-3.5",
+      "flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b bg-surface-sunken/50 px-5 py-3.5",
       className
     )}
     {...props}

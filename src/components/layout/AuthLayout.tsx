@@ -38,6 +38,10 @@ const AuthLayout = ({
         aria-hidden="true"
         className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/5"
       />
+      <div
+        aria-hidden="true"
+        className="stripes-hazard-light pointer-events-none absolute inset-y-0 right-0 w-1.5"
+      />
 
       <Link to="/" className="relative flex items-center gap-2.5">
         <LogoMark className="h-8 w-8 [&>rect:first-child]:fill-white/10" />

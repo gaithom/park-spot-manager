@@ -23,7 +23,7 @@ const chunk = <T,>(items: T[], size: number): T[][] => {
 const DriveAisle = () => (
   <div className="relative my-3.5 h-4" aria-hidden="true">
     <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t border-dashed border-strong/70" />
-    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-2xs font-medium uppercase tracking-[0.12em] text-muted-foreground/70">
+    <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface-sunken px-2 text-2xs font-medium uppercase tracking-[0.12em] text-muted-foreground/70">
       Drive aisle
     </span>
   </div>
@@ -45,7 +45,12 @@ const ParkingLotMap = ({
   const rows = chunk(slots, perRow)
 
   return (
-    <div className={cn("overflow-x-auto scrollbar-slim", className)}>
+    <div
+      className={cn(
+        "overflow-x-auto rounded-lg border bg-surface-sunken p-3 texture-hatch scrollbar-slim",
+        className
+      )}
+    >
       <div className={cn(size === "sm" ? "min-w-[34rem]" : "min-w-[42rem]")}>
         {rows.map((row, rowIndex) => (
           <div key={rowIndex}>

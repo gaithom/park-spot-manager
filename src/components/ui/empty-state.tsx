@@ -25,7 +25,8 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       {...props}
     >
       {Icon ? (
-        <span className="mb-1 flex h-11 w-11 items-center justify-center rounded-xl border border-dashed border-strong bg-surface-sunken text-muted-foreground">
+        // Dashed frame over faint hatching — an empty bay, not a broken panel.
+        <span className="texture-hatch mb-1 flex h-11 w-11 items-center justify-center rounded-xl border border-dashed border-strong bg-surface-sunken text-muted-foreground">
           <Icon className="h-5 w-5" />
         </span>
       ) : null}
